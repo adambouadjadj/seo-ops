@@ -35,10 +35,14 @@ def create_app(config_object=None):
     from app.blueprints.main import main_bp
     from app.blueprints.tasks import tasks_bp
     from app.blueprints.templates import templates_bp
+    from app.blueprints.webperf import webperf_bp
+    from app.blueprints.reporting import reporting_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(tasks_bp)
     app.register_blueprint(templates_bp)
+    app.register_blueprint(webperf_bp)
+    app.register_blueprint(reporting_bp)
 
     with app.app_context():
         db.create_all()

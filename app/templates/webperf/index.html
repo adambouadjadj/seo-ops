@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}WebPerf — SEO Ops{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">⚡ WebPerf</h1>
+    <p class="page-subtitle">Collecte PageSpeed Insights · Mise à jour Google Slides</p>
+  </div>
+  <div class="page-header-right">
+    <a href="{{ slides_url }}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">
+      Ouvrir Google Slides ↗
+    </a>
+  </div>
+</div>
+
+<div class="webperf-panel">
+  <form id="webperf-form">
+    <div class="form-group" style="max-width: 220px; margin-bottom: 16px;">
+      <label class="form-label" for="month">Mois cible</label>
+      <select class="form-select" name="month" id="month">
+        {% for m in month_options %}
+        <option value="{{ m }}">{{ m }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </form>
+
+  <div class="webperf-actions">
+    <button class="btn btn-primary"
+      hx-post="/webperf/collect"
+      hx-include="#webperf-form"
+      hx-target="#webperf-output"
+      hx-swap="innerHTML"
+      hx-indicator="#webperf-loading">
+      ⚡ Lancer la collecte PSI
+    </button>
+    <button class="btn btn-secondary"
+      hx-post="/webperf/update-slides"
+      hx-include="#webperf-form"
+      hx-target="#webperf-output"
+      hx-swap="innerHTML"
+      hx-indicator="#webperf-loading">
+      → Mettre à jour Google Slides
+    </button>
+    <span id="webperf-loading" class="htmx-indicator terminal-loading">
+      <span class="terminal-loading-dot"></span> Exécution en cours…
+    </span>
+  </div>
+
+  <div id="webperf-output" class="terminal-output-placeholder">
+    <span class="terminal-hint">L'output du script apparaîtra ici après l'exécution.</span>
+  </div>
+</div>
+{% endblock %}

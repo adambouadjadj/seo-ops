@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Reporting — SEO Ops{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">📊 Reporting</h1>
+    <p class="page-subtitle">Préparer les fichiers · Lancer Claude Code · Consulter l'historique</p>
+  </div>
+</div>
+
+<div class="section-label">Préparer le reporting</div>
+
+<div class="reporting-upload-card">
+  <form
+    hx-post="/reporting/stage"
+    hx-target="#staging-result"
+    hx-swap="innerHTML"
+    hx-encoding="multipart/form-data"
+    enctype="multipart/form-data">
+
+    <div class="form-row" style="gap: 16px; margin-bottom: 14px;">
+      <div class="form-group">
+        <label class="form-label">Monitorank Excel</label>
+        <input type="file" name="monitorank" accept=".xlsx,.xls" class="form-file-input" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">GSC Excel</label>
+        <input type="file" name="gsc" accept=".xlsx,.xls" class="form-file-input" required>
+      </div>
+    </div>
+
+    <div class="form-row" style="margin-bottom: 16px;">
+      <div class="form-group" style="max-width: 280px;">
+        <label class="form-label">Fichier tâches (.txt)</label>
+        <select name="task_file" class="form-select">
+          <option value="">— aucun —</option>
+          {% for fname, label in task_files %}
+          <option value="{{ fname }}">{{ label }} — {{ fname }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: flex-end;">
+      <button type="submit" class="btn btn-primary">Préparer les fichiers</button>
+    </div>
+  </form>
+
+  <div id="staging-result" style="margin-top: 16px;"></div>
+</div>
+
+<div style="margin-top: 36px;">
+  <div class="section-label">Historique des rapports</div>
+
+  {% if reports %}
+  <div class="report-list">
+    {% for r in reports %}
+    <div class="report-card">
+      <div class="report-card-main">
+        <span class="report-date">{{ r.date }}</span>
+        <span class="report-name">{{ r.name }}</span>
+      </div>
+      <div class="report-card-actions">
+        {% if r.html_path %}
+        <a href="/reporting/preview/{{ r.html_path }}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Aperçu</a>
+        <a href="/reporting/download/{{ r.html_path }}" class="btn btn-secondary btn-sm">↓ HTML</a>
+        {% endif %}
+        {% if r.md_path %}
+        <a href="/reporting/download/{{ r.md_path }}" class="btn btn-secondary btn-sm">↓ MD</a>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">📄</div>
+    <p>Aucun rapport généré pour l'instant.</p>
+    <p class="empty-sub">Lancez Claude Code après avoir préparé les fichiers.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

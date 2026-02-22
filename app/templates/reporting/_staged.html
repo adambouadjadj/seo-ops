@@ -1,0 +1,30 @@
+<div class="staged-confirmation fade-in">
+  <div class="staged-check">✓ Fichiers prêts dans <code>inputs/</code></div>
+
+  <div class="staged-files">
+    <div class="staged-file-row">
+      <span class="staged-file-label">Monitorank</span>
+      <code class="staged-file-name">{{ result.monitorank.name }}</code>
+    </div>
+    <div class="staged-file-row">
+      <span class="staged-file-label">GSC</span>
+      <code class="staged-file-name">{{ result.gsc.name }}</code>
+    </div>
+    {% if result.task %}
+    <div class="staged-file-row">
+      <span class="staged-file-label">Tâches</span>
+      <code class="staged-file-name">{{ result.task.name }}</code>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="staged-instructions">
+    <div class="staged-instructions-title">→ Lancer Claude Code</div>
+    <ol class="staged-steps">
+      <li>Ouvrir un terminal dans <code>seo-ops/</code></li>
+      <li>Lancer <code>claude</code> — le CLAUDE.md du workflow sera chargé automatiquement</li>
+      <li>Demander : <em>« Génère le rapport de la semaine {{ result.week_label }} »</em></li>
+      <li>Le rapport apparaîtra dans <code>output/</code> et sera visible dans l'historique ci-dessous</li>
+    </ol>
+  </div>
+</div>

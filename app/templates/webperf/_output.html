@@ -1,0 +1,15 @@
+<div class="terminal-output {{ 'terminal-success' if result.success else 'terminal-error' }}">
+  <div class="terminal-header">
+    <span class="terminal-status-icon">{{ '✓' if result.success else '✗' }}</span>
+    <span class="terminal-status-label">{{ action }}{% if month %} — {{ month }}{% endif %}</span>
+    <span class="terminal-status-badge {{ 'badge-ok' if result.success else 'badge-err' }}">
+      {{ 'OK' if result.success else 'ERREUR' }}
+    </span>
+  </div>
+  {% if result.output %}
+  <pre class="terminal-pre">{{ result.output }}</pre>
+  {% endif %}
+  {% if result.error %}
+  <pre class="terminal-pre terminal-stderr">{{ result.error }}</pre>
+  {% endif %}
+</div>

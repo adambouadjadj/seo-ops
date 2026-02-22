@@ -1,0 +1,44 @@
+<div class="task-card task-card--{{ task.status }} task-card--priority-{{ task.priority }} fade-in" id="task-{{ task.id }}">
+  <div class="task-card-main">
+    <button
+      class="status-toggle"
+      title="Changer le statut"
+      hx-post="{{ url_for('tasks.update_status', task_id=task.id) }}"
+      hx-target="#task-{{ task.id }}"
+      hx-swap="outerHTML"
+    >
+      <span class="status-dot status-dot--{{ task.status }}"></span>
+    </button>
+
+    <div class="task-content">
+      <p class="task-title {% if task.status == 'fait' %}task-title--done{% endif %}">
+        {% if task.is_recurring %}<span class="recurring-badge" title="Tâche récurrente">⟳</span>{% endif %}{{ task.title }}</p>
+      {% if task.description %}
+        <p class="task-description"><span class="desc-arrow">↳</span> {{ task.description }}</p>
+      {% endif %}
+      <div class="task-meta">
+        <span class="badge badge-category">{{ task.category_label }}</span>
+        <span class="badge badge-priority--{{ task.priority }}">{{ task.priority_label }}</span>
+        <span class="task-date">{{ task.created_at.strftime('%d/%m') if task.created_at else '' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="task-card-actions">
+    <button
+      class="btn-icon btn-edit"
+      title="Modifier"
+      hx-get="{{ url_for('tasks.edit_form', task_id=task.id) }}"
+      hx-target="#task-{{ task.id }}"
+      hx-swap="outerHTML"
+    >✎</button>
+    <button
+      class="btn-icon btn-delete"
+      title="Supprimer"
+      hx-delete="{{ url_for('tasks.delete', task_id=task.id) }}"
+      hx-target="#task-{{ task.id }}"
+      hx-swap="outerHTML"
+      hx-confirm="Supprimer cette tâche ?"
+    >✕</button>
+  </div>
+</div>

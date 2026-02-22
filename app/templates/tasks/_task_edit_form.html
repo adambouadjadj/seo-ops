@@ -1,0 +1,50 @@
+<div class="task-card task-card--editing" id="task-{{ task.id }}">
+  <form
+    hx-post="{{ url_for('tasks.update', task_id=task.id) }}"
+    hx-target="#task-{{ task.id }}"
+    hx-swap="outerHTML"
+    class="task-edit-form"
+  >
+    {{ form.hidden_tag() }}
+    <input type="hidden" name="_method" value="PATCH">
+
+    <div class="form-group">
+      {{ form.title(class='form-input', placeholder='Titre de la tâche') }}
+      {% if form.title.errors %}
+        <span class="form-error">{{ form.title.errors[0] }}</span>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      {{ form.description(class='form-input form-textarea', rows='2', placeholder='Description optionnelle...') }}
+    </div>
+
+    <div class="form-row form-row-selects">
+      <div class="form-group">
+        {{ form.category(class='form-select form-select-sm') }}
+      </div>
+      <div class="form-group">
+        {{ form.priority(class='form-select form-select-sm') }}
+      </div>
+      <div class="form-group">
+        {{ form.status(class='form-select form-select-sm') }}
+      </div>
+    </div>
+
+    <div class="edit-actions">
+      <button type="submit" class="btn btn-primary btn-sm">Sauvegarder</button>
+      <button
+        type="button"
+        class="btn btn-ghost btn-sm"
+        onclick="cancelEdit({{ task.id }})"
+      >Annuler</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  function cancelEdit(taskId) {
+    // Fetch the original card back
+    htmx.ajax('GET', '/tasks/' + taskId + '/card', {target: '#task-' + taskId, swap: 'outerHTML'});
+  }
+</script>

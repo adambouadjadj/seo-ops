@@ -1,0 +1,16 @@
+<div id="carry-over-banner"{% if oob %} hx-swap-oob="true"{% endif %}>
+  {% if carry_over_count > 0 %}
+  <div class="carry-over-alert">
+    <span class="carry-over-text">
+      ↷ <strong>{{ carry_over_count }}</strong> tâche{{ 's' if carry_over_count > 1 else '' }} non terminée{{ 's' if carry_over_count > 1 else '' }} la semaine dernière
+    </span>
+    <button
+      class="btn-carry-over"
+      hx-post="{{ url_for('tasks.carry_over_tasks') }}"
+      hx-vals='{"week_str": "{{ week_str }}"}'
+      hx-target="#task-list"
+      hx-swap="innerHTML"
+    >Tout reporter →</button>
+  </div>
+  {% endif %}
+</div>

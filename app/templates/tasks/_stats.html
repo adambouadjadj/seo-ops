@@ -1,0 +1,21 @@
+<div id="task-stats" class="task-stats"{% if oob %} hx-swap-oob="true"{% endif %}>
+  <div class="stat-item">
+    <span class="stat-dot dot-todo"></span>
+    <span class="stat-label">À faire</span>
+    <span class="stat-count">{{ todo_count }}</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-dot dot-en-cours"></span>
+    <span class="stat-label">En cours</span>
+    <span class="stat-count">{{ en_cours_count }}</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-dot dot-fait"></span>
+    <span class="stat-label">Fait</span>
+    <span class="stat-count">{{ fait_count }}</span>
+  </div>
+  <div class="stat-item stat-total">
+    <span class="stat-label">Total</span>
+    <span class="stat-count">{{ total }}</span>
+  </div>
+</div>

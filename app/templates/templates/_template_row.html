@@ -1,0 +1,39 @@
+<div class="template-row {% if not tmpl.is_active %}template-row--inactive{% endif %}" id="tmpl-{{ tmpl.id }}">
+  <div class="template-row-main">
+    <span class="recurring-badge">⟳</span>
+    <div class="template-info">
+      <span class="template-title">{{ tmpl.title }}</span>
+      {% if tmpl.description %}
+        <span class="template-desc">{{ tmpl.description }}</span>
+      {% endif %}
+    </div>
+    <div class="template-meta">
+      <span class="badge badge-category">{{ tmpl.category_label }}</span>
+      <span class="badge badge-priority--{{ tmpl.priority }}">{{ tmpl.priority_label }}</span>
+    </div>
+  </div>
+  <div class="template-row-actions">
+    <button
+      class="toggle-btn {% if tmpl.is_active %}toggle-btn--on{% else %}toggle-btn--off{% endif %}"
+      hx-post="{{ url_for('templates.toggle', tmpl_id=tmpl.id) }}"
+      hx-target="#tmpl-{{ tmpl.id }}"
+      hx-swap="outerHTML"
+      title="{% if tmpl.is_active %}Désactiver{% else %}Activer{% endif %}"
+    >{{ '●' if tmpl.is_active else '○' }}</button>
+    <button
+      class="btn-icon btn-edit"
+      hx-get="{{ url_for('templates.edit_form', tmpl_id=tmpl.id) }}"
+      hx-target="#tmpl-{{ tmpl.id }}"
+      hx-swap="outerHTML"
+      title="Modifier"
+    >✎</button>
+    <button
+      class="btn-icon btn-delete"
+      hx-delete="{{ url_for('templates.delete', tmpl_id=tmpl.id) }}"
+      hx-target="#tmpl-{{ tmpl.id }}"
+      hx-swap="outerHTML"
+      hx-confirm="Supprimer ce template ?"
+      title="Supprimer"
+    >✕</button>
+  </div>
+</div>

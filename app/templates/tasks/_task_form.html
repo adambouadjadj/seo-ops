@@ -1,0 +1,45 @@
+<form
+  hx-post="{{ url_for('tasks.create') }}"
+  hx-target="#task-list"
+  hx-swap="afterbegin"
+  hx-on::after-request="if(event.detail.successful){ this.reset(); document.getElementById('add-form-container').style.display='none'; document.getElementById('add-task-btn').textContent='+ Nouvelle tâche'; }"
+  class="task-form"
+>
+  {{ form.hidden_tag() }}
+  <input type="hidden" name="week_str" value="{{ week_str if week_str else '' }}">
+
+  <div class="form-row">
+    <div class="form-group form-group-title">
+      {{ form.title.label(class='form-label') }}
+      {{ form.title(class='form-input', placeholder='Ex: Optimiser les balises title des FP...', autocomplete='off') }}
+      {% if form.title.errors %}
+        <span class="form-error">{{ form.title.errors[0] }}</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      {{ form.description.label(class='form-label') }}
+      {{ form.description(class='form-input form-textarea', rows='2', placeholder='Détails optionnels...') }}
+    </div>
+  </div>
+
+  <div class="form-row form-row-selects">
+    <div class="form-group">
+      {{ form.category.label(class='form-label') }}
+      {{ form.category(class='form-select') }}
+    </div>
+    <div class="form-group">
+      {{ form.priority.label(class='form-label') }}
+      {{ form.priority(class='form-select') }}
+    </div>
+    <div class="form-group">
+      {{ form.status.label(class='form-label') }}
+      {{ form.status(class='form-select') }}
+    </div>
+    <div class="form-group form-group-actions">
+      <button type="submit" class="btn btn-primary">Ajouter</button>
+    </div>
+  </div>
+</form>

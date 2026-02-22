@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Templates récurrents — SEO Ops{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-left">
+    <h1 class="page-title">Templates récurrents</h1>
+    <p class="page-subtitle">Ces tâches sont générées chaque semaine via le bouton <strong>⟳ Récurrentes</strong>.</p>
+  </div>
+</div>
+
+<!-- Template list -->
+<div class="template-list" id="template-list">
+  {% for tmpl in templates %}
+    {% include 'templates/_template_row.html' %}
+  {% endfor %}
+</div>
+
+<!-- Add template form -->
+<div class="add-form-container" style="margin-top: 24px;">
+  <p class="section-label">Ajouter un template</p>
+  <form
+    hx-post="{{ url_for('templates.create') }}"
+    hx-target="#template-list"
+    hx-swap="beforeend"
+    hx-on::after-request="if(event.detail.successful){ this.reset(); }"
+    class="task-form"
+  >
+    {{ form.hidden_tag() }}
+    <div class="form-row">
+      <div class="form-group form-group-title">
+        {{ form.title(class='form-input', placeholder='Titre du template...', autocomplete='off') }}
+        {% if form.title.errors %}<span class="form-error">{{ form.title.errors[0] }}</span>{% endif %}
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        {{ form.description(class='form-input form-textarea', rows='2', placeholder='Description par défaut (optionnelle)...') }}
+      </div>
+    </div>
+    <div class="form-row form-row-selects">
+      <div class="form-group">
+        {{ form.category.label(class='form-label') }}
+        {{ form.category(class='form-select') }}
+      </div>
+      <div class="form-group">
+        {{ form.priority.label(class='form-label') }}
+        {{ form.priority(class='form-select') }}
+      </div>
+      <div class="form-group form-group-actions">
+        <button type="submit" class="btn btn-primary">Ajouter</button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>{% block title %}SEO Ops{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token() }}"}'>
+
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <span class="brand-icon">⬡</span>
+      <span class="brand-name">SEO <span class="brand-ops">Ops</span></span>
+    </div>
+    <div class="navbar-links">
+      <a href="/tasks" class="nav-link {% if request.path.startswith('/tasks') %}active{% endif %}">Tâches</a>
+      <a href="/templates" class="nav-link {% if request.path.startswith('/templates') %}active{% endif %}">⟳ Templates</a>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="{{ url_for('static', filename='js/htmx.min.js') }}"></script>
+  <script>
+    // Configure HTMX
+    htmx.config.defaultSwapStyle = 'outerHTML';
+
+    // Show toast notifications
+    document.body.addEventListener('htmx:afterRequest', function(evt) {
+      if (evt.detail.failed) {
+        showToast('Une erreur est survenue', 'error');
+      }
+    });
+
+    function showToast(message, type='success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.add('toast-visible'), 10);
+      setTimeout(() => {
+        toast.classList.remove('toast-visible');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // Expose for use in inline event handlers
+    window.showToast = showToast;
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

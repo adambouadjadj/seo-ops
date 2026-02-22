@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}Tâches — {{ week_monday.strftime('%d %b %Y') }} — SEO Ops{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-left">
+    <h1 class="page-title">Tâches</h1>
+    <div class="week-nav">
+      <a href="{{ url_for('tasks.week_view', year_week=prev_week) }}" class="week-nav-btn" title="Semaine précédente">‹</a>
+      <span class="week-label">
+        Semaine du <strong>{{ week_monday.strftime('%d %b %Y') }}</strong>
+        {% if is_current_week %}<span class="badge badge-current">Actuelle</span>{% endif %}
+      </span>
+      <a href="{{ url_for('tasks.week_view', year_week=next_week) }}" class="week-nav-btn" title="Semaine suivante">›</a>
+    </div>
+  </div>
+  <div class="page-header-right">
+    <button
+      class="btn btn-ghost"
+      onclick="toggleForm()"
+      id="add-task-btn"
+    >
+      + Nouvelle tâche
+    </button>
+    <button
+      class="btn btn-recurring"
+      hx-post="{{ url_for('tasks.generate') }}"
+      hx-vals='{"week_str": "{{ week_str }}"}'
+      hx-target="#task-list"
+      hx-swap="innerHTML"
+      title="Générer les tâches récurrentes pour cette semaine"
+    >
+      ⟳ Récurrentes
+    </button>
+    <a
+      href="{{ url_for('tasks.export_week', year_week=week_str) }}"
+      class="btn btn-secondary"
+    >
+      ↓ Exporter .txt
+    </a>
+    <button
+      class="btn btn-success-ghost"
+      hx-post="{{ url_for('tasks.complete_all') }}"
+      hx-vals='{"week_str": "{{ week_str }}"}'
+      hx-target="#task-list"
+      hx-swap="innerHTML"
+      title="Marquer toutes les tâches comme terminées"
+    >
+      ✓ Tout terminer
+    </button>
+    <button
+      class="btn btn-danger-ghost"
+      hx-post="{{ url_for('tasks.clear_week') }}"
+      hx-vals='{"week_str": "{{ week_str }}"}'
+      hx-target="#task-list"
+      hx-swap="innerHTML"
+      hx-confirm="Supprimer toutes les tâches de la semaine du {{ week_monday.strftime('%d %b %Y') }} ? Cette action est irréversible."
+      title="Vider la semaine"
+    >
+      ✕ Vider
+    </button>
+  </div>
+</div>
+
+{% if export_message %}
+<div class="alert alert-success">{{ export_message }}</div>
+{% endif %}
+
+<!-- Add Task Form (hidden by default) -->
+<div id="add-form-container" class="add-form-container" style="display:none;">
+  {% include 'tasks/_task_form.html' %}
+</div>
+
+<!-- Carry-over banner — tâches manuelles non terminées la semaine précédente -->
+{% if is_current_week %}
+  {% include 'tasks/_carry_over_banner.html' %}
+{% endif %}
+
+<!-- Task Stats — id ciblé par les swaps HTMX out-of-band -->
+{% set todo_count = tasks | selectattr('status', 'eq', 'todo') | list | length %}
+{% set en_cours_count = tasks | selectattr('status', 'eq', 'en_cours') | list | length %}
+{% set fait_count = tasks | selectattr('status', 'eq', 'fait') | list | length %}
+{% set total = tasks | list | length %}
+{% include 'tasks/_stats.html' %}
+
+<!-- Task List -->
+<div id="task-list" class="task-list">
+  {% if tasks %}
+    {% for task in tasks %}
+      {% include 'tasks/_task_card.html' %}
+    {% endfor %}
+  {% else %}
+    {% include 'tasks/_empty_state.html' %}
+  {% endif %}
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function toggleForm() {
+    const container = document.getElementById('add-form-container');
+    const btn = document.getElementById('add-task-btn');
+    if (container.style.display === 'none') {
+      container.style.display = 'block';
+      container.classList.add('form-slide-in');
+      btn.textContent = '✕ Annuler';
+      // Focus on title input
+      setTimeout(() => {
+        const titleInput = container.querySelector('input[name="title"]');
+        if (titleInput) titleInput.focus();
+      }, 100);
+    } else {
+      container.style.display = 'none';
+      container.classList.remove('form-slide-in');
+      btn.textContent = '+ Nouvelle tâche';
+    }
+  }
+
+  // After task created via HTMX, reset the form and hide it
+  document.body.addEventListener('htmx:afterSwap', function(evt) {
+    if (evt.detail.target && evt.detail.target.id === 'task-list') {
+      // If a task was prepended, scroll to top of list
+    }
+    // If new task card was swapped in before task list
+    const addContainer = document.getElementById('add-form-container');
+    if (addContainer && evt.detail.elt && evt.detail.elt.closest('#add-form-container')) {
+      // Form submitted successfully — hide form
+      addContainer.style.display = 'none';
+      document.getElementById('add-task-btn').textContent = '+ Nouvelle tâche';
+    }
+  });
+</script>
+{% endblock %}

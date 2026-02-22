@@ -1,0 +1,32 @@
+# Credentials & secrets — ne jamais commiter
+tools/.env
+tools/credentials/service_account.json
+.env
+
+# Flask app
+instance/
+*.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+*.egg-info/
+
+# Fichiers temp Office (ouverts)
+~$*
+
+# Fichiers systeme Windows
+Thumbs.db
+desktop.ini
+
+# Fichiers générés / données — pas de valeur dans git
+output/
+inputs/
+tasks/
+
+# Claude Code settings (workspace-local)
+.claude/

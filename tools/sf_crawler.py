@@ -95,7 +95,7 @@ def run_crawl(url: str, output_folder: Path) -> None:
 # ── Rapport Markdown ─────────────────────────────────────────────────────────
 
 def _load_inlinks(folder: Path, filename: str) -> pd.DataFrame:
-    """Charge les colonnes Source et Destination du fichier inlinks (peut faire ~450 Mo)."""
+    """Charge Source, Destination, Type et Texte Alt du fichier inlinks (peut faire ~450 Mo)."""
     path = folder / filename
     if not path.exists():
         print(f"  [WARN] Fichier introuvable : {filename}")
@@ -105,7 +105,9 @@ def _load_inlinks(folder: Path, filename: str) -> pd.DataFrame:
         cols = sample.columns.tolist()
         src_col  = next((c for c in cols if c.lower() in ("source", "source url") or c.lower().startswith("source")), None)
         dest_col = next((c for c in cols if "destination" in c.lower()), None)
-        usecols  = [c for c in [src_col, dest_col] if c]
+        type_col = next((c for c in cols if c.lower() == "type"), None)
+        alt_col  = next((c for c in cols if "alt" in c.lower()), None)
+        usecols  = [c for c in [src_col, dest_col, type_col, alt_col] if c]
         if usecols:
             return pd.read_csv(path, encoding="utf-8-sig", usecols=usecols, low_memory=False)
     except Exception:
@@ -429,24 +431,26 @@ def generate_md(url: str, output_folder: Path, date_str: str, slug: str) -> Path
     # ── 11. Images sans attribut alt ────────────────────────────────────────
     lines += ["## 11. Images sans attribut alt", ""]
 
-    if not df_images.empty:
-        img_src_col = find_col(df_images, "image src", "src", "adresse", "address")
-        img_alt_col = find_col(df_images, "alt text", "texte alternatif", "alt")
-        img_page_col = find_col(df_images, "from", "depuis", "page source", "address of page")
+    if not df_inlinks.empty:
+        type_col    = find_col(df_inlinks, "type")
+        alt_col     = find_col(df_inlinks, "texte alt", "alt text", "alt")
+        dest_col    = find_col(df_inlinks, "destination")
+        src_col_il  = find_col(df_inlinks, "source")
 
-        if img_alt_col:
-            missing_alt = df_images[df_images[img_alt_col].isna() | (df_images[img_alt_col].astype(str).str.strip() == "")]
+        if type_col and alt_col:
+            img_links = df_inlinks[df_inlinks[type_col].astype(str).str.lower() == "image"]
+            missing_alt = img_links[img_links[alt_col].isna() | (img_links[alt_col].astype(str).str.strip() == "")]
             lines.append(f"- **Images sans alt :** {len(missing_alt)}")
-            if not missing_alt.empty and img_src_col:
+            if not missing_alt.empty and dest_col:
                 for _, row in missing_alt.head(20).iterrows():
-                    page = f" (sur `{row[img_page_col]}`)" if img_page_col else ""
-                    lines.append(f"  - `{str(row[img_src_col])[:100]}`{page}")
+                    page = f" (sur `{row[src_col_il]}`)" if src_col_il else ""
+                    lines.append(f"  - `{str(row[dest_col])[:100]}`{page}")
                 if len(missing_alt) > 20:
                     lines.append(f"  - *(et {len(missing_alt) - 20} autres...)*")
         else:
-            lines.append("- Colonne alt text non trouvée dans les données.")
+            lines.append("- Colonnes Type/Alt Text non trouvées dans les données inlinks.")
     else:
-        lines.append("- Données images non disponibles (vérifier export `Images:All`).")
+        lines.append("- Données inlinks non disponibles.")
     lines.append("")
 
     # ── 12. Liens internes brisés ────────────────────────────────────────────
@@ -503,9 +507,12 @@ def md_to_html(md_path: Path) -> Path:
         if line.startswith("# "):
             html_parts.append(f'<div class="header"><h1>{line[2:]}</h1>')
             in_header = True
-        elif in_header and (line.startswith("**Site crawlé :**") or line.startswith("**Date :**")):
-            inner = _inline(line)
-            html_parts.append(f'<p style="margin:4px 0 0;font-size:13px;color:#a8c4e0;">{inner}</p>')
+        elif in_header and line.startswith("**Site crawlé :**"):
+            value = line.split(":**", 1)[1].strip()
+            html_parts.append(f'<p style="margin:6px 0 0;font-size:13px;color:#a8c4e0;">{value}</p>')
+        elif in_header and line.startswith("**Date :**"):
+            value = line.split(":**", 1)[1].strip()
+            html_parts.append(f'<p style="margin:2px 0 0;font-size:13px;color:#a8c4e0;">{value}</p>')
         elif line.startswith("## "):
             if in_header:
                 html_parts.append('</div><div class="content">')

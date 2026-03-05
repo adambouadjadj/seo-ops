@@ -1,18 +1,35 @@
-# SEO Ops
+# SEO Ops Toolkit
 
-Boîte à outils SEO locale pour AB Croisière. Trois workflows automatisés :
-
-| Outil | Fréquence | Description |
-|---|---|---|
-| **Task Manager** (web app) | Quotidien | Suivi des tâches SEO de la semaine, export vers le reporting |
-| **Reporting hebdomadaire** | Vendredi | Génère le mail de reporting depuis Monitorank + GSC via Claude |
-| **WebPerf mensuel** | 1x/mois | PSI → Google Sheets → Google Slides automatisé |
+An end-to-end SEO automation suite built for real operational workflows: weekly reporting, technical crawl analysis, and monthly web performance tracking — all driven by scripts and a local web dashboard.
 
 ---
 
-## 1. Task Manager (Flask web app)
+## What's inside
 
-### Installation
+| Tool | Cadence | Description |
+|---|---|---|
+| **Task Manager** (Flask web app) | Daily | Track weekly SEO tasks, manage recurring checklists, export to reporting |
+| **Weekly SEO Reporting** | Weekly | Auto-generate structured reporting emails from rank tracking + GSC exports |
+| **Crawl Analysis** | On-demand | Run Screaming Frog via CLI, parse CSVs, generate full SEO health reports |
+| **Monthly WebPerf** | Monthly | PageSpeed Insights → Google Sheets → Google Slides, fully automated |
+
+---
+
+## Stack
+
+- **Backend:** Python, Flask 3.x, SQLAlchemy
+- **Frontend:** HTMX, Jinja2, vanilla CSS (dark theme)
+- **Automation:** pandas, gspread, Google APIs (Sheets, Slides, Drive, PSI)
+- **Crawl:** Screaming Frog SEO Spider (CLI mode) + custom CSV parser
+- **AI-assisted reporting:** Claude (prompt-driven reporting from structured exports)
+
+---
+
+## 1. Task Manager
+
+A lightweight Flask web app to manage weekly SEO tasks with recurring templates and one-click export.
+
+### Setup
 
 ```bash
 git clone https://github.com/zhanpyu/seo-ops.git
@@ -24,123 +41,152 @@ python -m venv .venv
 
 pip install -r requirements.txt
 
-cp .env.example .env         # puis éditer .env
+cp .env.example .env         # fill in your values
 python run.py
 ```
 
-Ouvrir [http://localhost:5000](http://localhost:5000)
+Open [http://localhost:5000](http://localhost:5000)
 
-### `.env` requis
+### `.env` required
 
 ```bash
-SECRET_KEY=<python -c "import secrets; print(secrets.token_hex(32))">
+SECRET_KEY=<generate with: python -c "import secrets; print(secrets.token_hex(32))">
 DATABASE_URL=sqlite:///seo_ops.db
 FLASK_ENV=development
 ```
 
-### Workflow hebdomadaire
+### Weekly workflow
 
-1. **Lundi** — cliquer **⟳ Récurrentes** pour générer les 8 tâches récurrentes
-2. **Au fil de la semaine** — ajouter les tâches, mettre à jour les statuts
-3. **Vendredi** — cliquer **↓ Exporter .txt** → fichier `tasks/task_DD_MM_YY.txt` prêt pour le reporting
-
-### Stack
-
-- Flask 3.x + SQLAlchemy (SQLite local → PostgreSQL-ready via `DATABASE_URL`)
-- HTMX + Jinja2 + CSS vanilla dark theme
-- Flask-WTF (CSRF)
+1. **Monday** — click **Recurring** to generate the 8 recurring tasks for the week
+2. **Throughout the week** — add tasks, update statuses
+3. **Friday** — click **Export .txt** → feeds directly into the reporting workflow
 
 ---
 
-## 2. Reporting SEO hebdomadaire
+## 2. Weekly SEO Reporting
 
-Génère un mail de reporting structuré (Monitorank positions + GSC trafic + actions de la semaine).
+Generates a structured HTML reporting email from rank tracking exports (Monitorank) and Google Search Console data.
 
-### Inputs à préparer
+### Inputs
 
-| Fichier | Chemin |
+| File | Path |
 |---|---|
-| Export Monitorank | `inputs/Suivi positionnement AB DD-MM-YY.xlsx` |
-| Export GSC | `inputs/GSC performance AB DD-MM-YY.xlsx` |
-| Tâches de la semaine | `tasks/task_DD_MM_YY.txt` (généré par le Task Manager) |
+| Rank tracking export | `inputs/ranking_DD-MM-YY.xlsx` |
+| GSC export | `inputs/gsc_DD-MM-YY.xlsx` |
+| Weekly tasks | `tasks/task_DD_MM_YY.txt` (from Task Manager) |
 
 ### Usage
 
-Ouvrir Claude (claude.ai ou Claude Code) dans le dossier `seo-ops/` avec le `workflows/reporting/CLAUDE.md` chargé, fournir les 3 fichiers inputs.
+Open Claude Code in the `seo-ops/` directory with `workflows/reporting/CLAUDE.md` loaded, provide the 3 input files.
 
 ### Output
 
-- `output/reporting_AB_DD-MM-YY.md` — version Markdown (archivage)
-- `output/reporting_AB_DD-MM-YY_email.html` — HTML Outlook-ready (ouvrir dans navigateur → Ctrl+A → coller dans Outlook)
+- `output/reporting/reporting_DD-MM-YY.md` — Markdown archive
+- `output/reporting/reporting_DD-MM-YY_email.html` — Outlook-ready HTML (open in browser → Ctrl+A → paste into Outlook)
 
 ---
 
-## 3. WebPerf mensuel
+## 3. Crawl Analysis (Screaming Frog CLI)
 
-Collecte les scores PageSpeed Insights pour 9 URLs stratégiques et met à jour le Google Slides de reporting automatiquement.
+Runs a full Screaming Frog crawl via CLI and generates a comprehensive SEO health report in Markdown and HTML.
 
-### Prérequis (une seule fois)
+### Usage
+
+```bash
+python tools/sf_crawler.py https://example.com
+```
+
+### What it analyzes
+
+- HTTP status codes (4xx, 5xx)
+- Page titles — missing, duplicates, length issues
+- H1 tags — missing, duplicates
+- Meta descriptions — missing, duplicates, length issues
+- Canonical tags — missing, non-self-referencing
+- Crawl depth distribution + pages buried beyond depth 5
+- Internal linking — orphan pages, inlink counts
+- Images — missing alt text
+- Fasteryze/cache noise filtering (auto-removes false positives from `?frz-` parameters)
+
+### Output
+
+```
+output/crawl_reports/
+├── crawl_SITE_DD-MM-YY.md
+├── crawl_SITE_DD-MM-YY.html
+└── SITE_DD-MM-YY/
+    ├── interne_tous.csv
+    ├── codes_de_réponse_tous.csv
+    └── ...
+```
+
+---
+
+## 4. Monthly WebPerf
+
+Collects PageSpeed Insights scores for strategic URLs and pushes them directly into a Google Sheets + Google Slides reporting deck.
+
+### Prerequisites
 
 ```bash
 pip install gspread google-auth requests google-api-python-client
 ```
 
-Fichiers nécessaires dans `tools/` (non commités, à récupérer séparément) :
-- `tools/.env` — contient `PSI_API_KEY`
-- `tools/credentials/service_account.json` — credentials Google API
+Files required in `tools/` (not committed — obtain separately):
+- `tools/.env` — contains `PSI_API_KEY`, `SPREADSHEET_ID`, `SLIDES_ID`
+- `tools/credentials/service_account.json` — Google service account key
 
-### Usage mensuel
+### Monthly run
 
 ```bash
-# Étape 1 — Collecte PSI → Google Sheets
+# Step 1 — Collect PSI scores → push to Google Sheets
 python tools/webperf_runner.py
 
-# Étape 2 — Sheets → tableaux Google Slides
+# Step 2 — Pull from Sheets → update Google Slides tables
 python tools/slides_updater.py
 
-# Étape 3 — Graphiques : ouvrir Slides → "Refresh all"
+# Step 3 — Open Slides → Refresh all (linked charts)
 ```
 
-Pour un mois spécifique :
+For a specific month:
 ```bash
 python tools/webperf_runner.py 2026-03
 ```
 
 ---
 
-## Structure du projet
+## Project Structure
 
 ```
 seo-ops/
-├── app/                        # Flask task manager
+├── app/                          # Flask task manager
 │   ├── blueprints/
-│   │   ├── tasks/              # CRUD tâches, export, generate
-│   │   ├── templates/          # Templates récurrents
+│   │   ├── tasks/                # Task CRUD, export, recurring
+│   │   ├── reporting/            # Reporting workflow UI
+│   │   ├── crawl/                # Crawl trigger + results UI
 │   │   └── main/
-│   ├── models.py               # Task, TaskTemplate
-│   ├── static/                 # CSS + HTMX local
-│   └── templates/              # Jinja2 partials
-├── tools/                      # Scripts automation
-│   ├── webperf_runner.py       # PSI → Google Sheets
-│   ├── slides_updater.py       # Sheets → Google Slides
-│   ├── ppt_generator.py        # Génération PPT local
-│   ├── make_template.py        # Template PPT base
-│   ├── webperf_template.pptx   # Template PPT
-│   └── .env.example            # Variables requises (sans secrets)
+│   ├── models.py                 # Task, TaskTemplate
+│   ├── static/                   # CSS + local HTMX
+│   └── templates/                # Jinja2 templates
+├── tools/                        # Automation scripts
+│   ├── sf_crawler.py             # Screaming Frog CLI + report generator
+│   ├── webperf_runner.py         # PSI → Google Sheets
+│   ├── slides_updater.py         # Sheets → Google Slides
+│   └── .env.example
 ├── workflows/
-│   ├── reporting/CLAUDE.md     # Prompt système reporting hebdo
-│   └── webperf/CLAUDE.md       # Prompt système webperf mensuel
-├── inputs/                     # Fichiers Excel (gitignored)
-├── output/                     # Rapports générés (gitignored)
-├── tasks/                      # Exports .txt tâches (gitignored)
-├── instance/                   # SQLite DB (gitignored)
+│   ├── reporting/CLAUDE.md       # Reporting prompt system
+│   ├── webperf/CLAUDE.md         # WebPerf prompt system
+│   └── crawl/CLAUDE.md           # Crawl prompt system
+├── inputs/                       # Excel exports (gitignored)
+├── output/                       # Generated reports (gitignored)
+├── tasks/                        # Task exports (gitignored)
 ├── run.py
 └── requirements.txt
 ```
 
 ---
 
-## Variables d'environnement
+## Environment Variables
 
 ### `seo-ops/.env` (Task Manager)
 
@@ -150,12 +196,12 @@ DATABASE_URL=sqlite:///seo_ops.db
 FLASK_ENV=development
 ```
 
-### `tools/.env` (Scripts automation)
+### `tools/.env` (Automation scripts)
 
 ```bash
 PSI_API_KEY=          # Google PageSpeed Insights API
-SPREADSHEET_ID=       # Google Sheets WebPerf
-SLIDES_ID=            # Google Slides WebPerf
+SPREADSHEET_ID=       # Google Sheets ID
+SLIDES_ID=            # Google Slides ID
 ```
 
-Voir `tools/.env.example` pour le détail complet.
+See `tools/.env.example` for the full reference.

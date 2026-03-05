@@ -5,7 +5,7 @@ from datetime import date, timedelta
 PROJECT_ROOT = Path(__file__).resolve().parents[3]  # seo-ops/
 INPUTS_DIR = PROJECT_ROOT / 'inputs'
 TASKS_DIR = PROJECT_ROOT / 'tasks'
-OUTPUT_DIR = PROJECT_ROOT / 'output'
+OUTPUT_DIR = PROJECT_ROOT / 'output' / 'reporting'
 
 
 def _current_friday() -> date:

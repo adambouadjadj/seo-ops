@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Crawl — SEO Ops{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">🕷 Crawl</h1>
+    <p class="page-subtitle">Lancer un crawl Screaming Frog · Suivre la progression · Consulter l'historique</p>
+  </div>
+</div>
+
+<div class="section-label">Lancer un crawl</div>
+
+<div class="reporting-upload-card">
+  <form
+    hx-post="/crawl/start"
+    hx-target="#crawl-status"
+    hx-swap="innerHTML"
+    hx-indicator="#crawl-loading">
+
+    <div class="form-row" style="gap: 16px; margin-bottom: 16px; align-items: flex-end;">
+      <div class="form-group" style="flex: 1;">
+        <label class="form-label">URL à crawler</label>
+        <input
+          type="url"
+          name="url"
+          value="https://www.abcroisiere.com"
+          class="form-input"
+          required
+          style="width: 100%;">
+      </div>
+      <div>
+        <button type="submit" class="btn btn-primary">Lancer le crawl</button>
+        <span id="crawl-loading" class="htmx-indicator" style="margin-left: 8px; font-size: 13px; color: var(--text-muted);">Lancement...</span>
+      </div>
+    </div>
+  </form>
+
+  <div id="crawl-status" style="margin-top: 8px;"></div>
+</div>
+
+<div style="margin-top: 36px;">
+  <div class="section-label">Historique des crawls</div>
+
+  {% if crawls %}
+  <div class="report-list">
+    {% for c in crawls %}
+    {% include "crawl/_crawl_card.html" %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">🕷</div>
+    <p>Aucun rapport de crawl pour l'instant.</p>
+    <p class="empty-sub">Lancez un crawl depuis le formulaire ci-dessus.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1183,6 +1183,18 @@ body {
   flex-shrink: 0;
 }
 
+/* ---------- Crawl page ---------- */
+.crawl-status-block {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+}
+
+.badge-running { background: rgba(234,179,8,.15);  color: #ca8a04; }
+.badge-done    { background: rgba(16,185,129,.15); color: var(--emerald); }
+.badge-error   { background: rgba(239,68,68,.15);  color: var(--red); }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 600px) {
   .main-content { padding: 20px 16px; }

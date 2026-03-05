@@ -124,15 +124,17 @@ Pour chacune : requête, position actuelle, impressions, reco actionnable (title
 ---
 
 ## Sauvegarde de l'output
-Une fois le mail généré, produire deux fichiers dans `output/` (même date que les fichiers inputs) :
-- `output/reporting_AB_DD-MM-YY.md` — version Markdown (source, archivage)
-- `output/reporting_AB_DD-MM-YY_email.html` — version HTML Outlook-ready (à ouvrir dans un navigateur, puis Ctrl+A / Ctrl+C / coller dans Outlook)
+Une fois le mail généré, produire deux fichiers dans `output/reporting/` (même date que les fichiers inputs) :
+- `output/reporting/reporting_AB_DD-MM-YY.md` — version Markdown (source, archivage)
+- `output/reporting/reporting_AB_DD-MM-YY_email.html` — version HTML Outlook-ready (à ouvrir dans un navigateur, puis Ctrl+A / Ctrl+C / coller dans Outlook)
 
 Contraintes HTML email :
 - CSS inline uniquement (pas de bloc `<style>`)
 - Mise en page via `<table>` (pas de flexbox/grid)
 - Largeur max 640px, police Arial/Helvetica
 - Gains en vert (#27ae60), baisses en rouge (#c0392b), CTR faible en orange (#e67e22)
+- Pas de footer "Reporting généré automatiquement" ou mention similaire
+- Pas de doubles tirets `--` comme séparateurs (trop IA) : utiliser `:` ou reformuler
 
 ## Règle générale
 Si une information est manquante ou incohérente, l'indiquer clairement dans le mail plutôt que de l'omettre.

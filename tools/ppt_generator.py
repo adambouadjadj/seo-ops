@@ -26,7 +26,7 @@ from pptx.oxml.ns import qn
 TEMPLATE_PPT     = "tools/webperf_template.pptx"
 CREDENTIALS_FILE = "tools/credentials/service_account.json"
 SPREADSHEET_ID   = "1D7IYLK2GQ77L8o-mXJzFzFqxgM0m7DLH0cxtw8khtn8"
-OUTPUT_DIR       = "output"
+OUTPUT_DIR       = "output/webperf"
 
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",

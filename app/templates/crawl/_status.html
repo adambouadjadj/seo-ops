@@ -1,0 +1,45 @@
+{% if job.status == 'running' %}
+<div
+  class="crawl-status-block"
+  hx-get="/crawl/status/{{ job_id }}"
+  hx-trigger="every 5s"
+  hx-swap="outerHTML">
+  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+    <span class="badge badge-running">En cours</span>
+    <span style="font-size: 13px; color: var(--text-muted);">
+      Démarré à {{ job.started_at.strftime('%H:%M:%S') }} — {{ job.url }}
+    </span>
+  </div>
+  <p style="font-size: 13px; color: var(--text-muted); margin: 0;">
+    Le crawl peut durer 10 à 20 minutes. Cette page se rafraîchit automatiquement toutes les 5 secondes.
+  </p>
+</div>
+
+{% elif job.status == 'done' %}
+<div class="crawl-status-block">
+  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+    <span class="badge badge-done">Terminé</span>
+    <span style="font-size: 13px; color: var(--text-muted);">{{ job.url }}</span>
+    {% if job.report %}
+    <a href="/crawl/preview/{{ job.report }}" target="_blank" rel="noopener" class="btn btn-primary btn-sm" style="margin-left: auto;">Voir le rapport</a>
+    {% endif %}
+  </div>
+  {% if job.output %}
+  <pre class="terminal-output terminal-success">{{ job.output }}</pre>
+  {% endif %}
+</div>
+
+{% elif job.status == 'error' %}
+<div class="crawl-status-block">
+  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+    <span class="badge badge-error">Erreur</span>
+    <span style="font-size: 13px; color: var(--text-muted);">{{ job.url }}</span>
+  </div>
+  {% if job.error %}
+  <pre class="terminal-output terminal-error">{{ job.error }}</pre>
+  {% endif %}
+  {% if job.output %}
+  <pre class="terminal-output terminal-error" style="margin-top: 8px;">{{ job.output }}</pre>
+  {% endif %}
+</div>
+{% endif %}

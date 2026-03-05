@@ -1,0 +1,15 @@
+<div class="report-card">
+  <div class="report-card-main">
+    <span class="report-date">{{ c.date }}</span>
+    <span class="report-name">{{ c.slug }}</span>
+  </div>
+  <div class="report-card-actions">
+    {% if c.html_path %}
+    <a href="/crawl/preview/{{ c.html_path }}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Aperçu</a>
+    <a href="/crawl/download/{{ c.html_path }}" class="btn btn-secondary btn-sm">↓ HTML</a>
+    {% endif %}
+    {% if c.md_path %}
+    <a href="/crawl/download/{{ c.md_path }}" class="btn btn-secondary btn-sm">↓ MD</a>
+    {% endif %}
+  </div>
+</div>

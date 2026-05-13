@@ -32,9 +32,12 @@ tasks/
 scripts/mapping_*.csv
 scripts/logs/
 
-# Claude Code settings (workspace-local) — skills exposés, le reste privé
-.claude/
-!.claude/skills/
+# Claude Code — données personnelles/locales ignorées, skills exposés
+.claude/settings*.json
+.claude/settings*.local.json
+.claude/projects/
+.claude/plans/
+.claude/todos/
 .claude/skills/*/cache/
 .claude/skills/*/output/
 .claude/skills/*/briefs/

@@ -68,15 +68,15 @@ def _run_crawl(job_id: str, url: str) -> None:
 
 
 def _find_latest_report() -> str | None:
-    """Return the most recently modified crawl HTML report filename."""
+    """Return the most recently modified crawl HTML report, as a path relative to OUTPUT_DIR."""
     if not OUTPUT_DIR.exists():
         return None
-    html_files = sorted(
-        OUTPUT_DIR.glob('crawl_*.html'),
-        key=lambda p: p.stat().st_mtime,
-        reverse=True,
-    )
-    return html_files[0].name if html_files else None
+    # New structure: inside subfolders; old structure: flat
+    candidates = list(OUTPUT_DIR.glob('*/crawl_*.html')) + list(OUTPUT_DIR.glob('crawl_*.html'))
+    if not candidates:
+        return None
+    latest = max(candidates, key=lambda p: p.stat().st_mtime)
+    return str(latest.relative_to(OUTPUT_DIR))
 
 
 def get_job(job_id: str) -> dict | None:
@@ -86,27 +86,35 @@ def get_job(job_id: str) -> dict | None:
 
 
 def get_past_crawls() -> list:
-    """List crawl HTML reports from output/crawl_reports/, sorted by date desc."""
+    """
+    List crawl HTML reports sorted by date desc.
+    Handles both new (subfolder) and old (flat) structures.
+    Returns paths relative to OUTPUT_DIR so routes can serve them safely.
+    """
     if not OUTPUT_DIR.exists():
         return []
 
-    html_files = sorted(
-        OUTPUT_DIR.glob('crawl_*.html'),
-        key=lambda p: p.stat().st_mtime,
-        reverse=True,
-    )
+    # Collect all HTML reports: nested (new) + flat (old), deduplicate by stem
+    by_stem: dict = {}
+    for html_f in OUTPUT_DIR.glob('*/crawl_*.html'):
+        by_stem[html_f.stem] = html_f
+    for html_f in OUTPUT_DIR.glob('crawl_*.html'):
+        if html_f.stem not in by_stem:  # flat only if no nested version
+            by_stem[html_f.stem] = html_f
+
+    html_files = sorted(by_stem.values(), key=lambda p: p.stat().st_mtime, reverse=True)
 
     crawls = []
     for html_f in html_files:
-        stem = html_f.stem  # e.g. crawl_abcroisiere_05-03-26
-        md_f = OUTPUT_DIR / (stem + '.md')
+        stem = html_f.stem
+        md_f = html_f.with_suffix('.md')
         m = re.search(r'(\d{2}-\d{2}-\d{2,4})$', stem)
         date_str = m.group(1) if m else stem
         slug_match = re.match(r'crawl_(.+?)_\d{2}-\d{2}-\d{2,4}$', stem)
         slug = slug_match.group(1) if slug_match else stem
         crawls.append({
-            'html_path': html_f.name,
-            'md_path': md_f.name if md_f.exists() else None,
+            'html_path': str(html_f.relative_to(OUTPUT_DIR)),
+            'md_path': str(md_f.relative_to(OUTPUT_DIR)) if md_f.exists() else None,
             'slug': slug,
             'date': date_str,
         })

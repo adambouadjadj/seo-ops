@@ -1,8 +1,10 @@
 import subprocess
 import datetime
+import re
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]  # seo-ops/
+PROJECT_ROOT  = Path(__file__).resolve().parents[3]  # seo-ops/
+WEBPERF_DIR   = PROJECT_ROOT / 'output' / 'webperf'
 
 
 def run_script(script_name: str, args: list = None) -> dict:
@@ -18,7 +20,7 @@ def run_script(script_name: str, args: list = None) -> dict:
             cmd,
             capture_output=True,
             text=True,
-            timeout=300,
+            timeout=600,
             cwd=str(PROJECT_ROOT),
         )
         return {
@@ -41,6 +43,40 @@ def get_month_options() -> list:
     else:
         prev = f'{now.year}-{now.month - 1:02d}'
     return [current, prev]
+
+
+def list_recaps() -> list:
+    """
+    Retourne les recaps disponibles, triés du plus récent au plus ancien.
+    Cherche dans output/webperf/YYYY-MM/recap_MM-YYYY.md
+    Format retourné : [{'month': 'YYYY-MM', 'label': 'Févr. 2026', 'path': Path}, ...]
+    """
+    MONTH_FR = ["", "Janv.", "Févr.", "Mars", "Avr.", "Mai", "Juin",
+                "Juil.", "Août", "Sept.", "Oct.", "Nov.", "Déc."]
+    recaps = []
+    if not WEBPERF_DIR.exists():
+        return recaps
+    for folder in sorted(WEBPERF_DIR.iterdir(), reverse=True):
+        if not folder.is_dir() or not re.match(r'^\d{4}-\d{2}$', folder.name):
+            continue
+        md_files = list(folder.glob('recap_*.md'))
+        if md_files:
+            try:
+                year, month = map(int, folder.name.split('-'))
+                label = f"{MONTH_FR[month]} {year}"
+            except (ValueError, IndexError):
+                label = folder.name
+            recaps.append({'month': folder.name, 'label': label, 'path': md_files[0]})
+    return recaps
+
+
+def get_recap_path(month: str) -> Path | None:
+    """Retourne le chemin du recap pour un mois YYYY-MM, ou None si inexistant."""
+    if not re.match(r'^\d{4}-\d{2}$', month):
+        return None
+    folder = WEBPERF_DIR / month
+    md_files = list(folder.glob('recap_*.md')) if folder.exists() else []
+    return md_files[0] if md_files else None
 
 
 def get_slides_url() -> str:

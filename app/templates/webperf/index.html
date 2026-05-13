@@ -43,6 +43,14 @@
       hx-indicator="#webperf-loading">
       → Mettre à jour Google Slides
     </button>
+    <button class="btn btn-secondary"
+      hx-post="/webperf/recap"
+      hx-include="#webperf-form"
+      hx-target="#webperf-output"
+      hx-swap="innerHTML"
+      hx-indicator="#webperf-loading">
+      📋 Générer le recap .md
+    </button>
     <span id="webperf-loading" class="htmx-indicator terminal-loading">
       <span class="terminal-loading-dot"></span> Exécution en cours…
     </span>
@@ -52,4 +60,19 @@
     <span class="terminal-hint">L'output du script apparaîtra ici après l'exécution.</span>
   </div>
 </div>
+
+{% if recaps %}
+<div class="webperf-panel" style="margin-top:24px;">
+  <p style="font-size:13px;font-weight:600;color:var(--text-secondary);margin:0 0 12px 0;">Recaps disponibles</p>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;">
+    {% for r in recaps %}
+    <a href="/webperf/recap/download/{{ r.month }}"
+       class="btn btn-secondary btn-sm"
+       title="Télécharger {{ r.path.name }}">
+      {{ r.label }} ↓
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
 {% endblock %}

@@ -31,21 +31,21 @@ def status(job_id):
     return render_template('crawl/_status.html', job_id=job_id, job=job)
 
 
-@crawl_bp.route('/preview/<filename>', methods=['GET'])
+@crawl_bp.route('/preview/<path:filename>', methods=['GET'])
 def preview(filename):
     safe_path = (OUTPUT_DIR / filename).resolve()
-    if safe_path.parent.resolve() != OUTPUT_DIR.resolve():
+    if not safe_path.is_relative_to(OUTPUT_DIR.resolve()):
         abort(403)
     if not safe_path.exists():
         abort(404)
-    return send_from_directory(str(OUTPUT_DIR), filename, mimetype='text/html')
+    return send_from_directory(str(safe_path.parent), safe_path.name, mimetype='text/html')
 
 
-@crawl_bp.route('/download/<filename>', methods=['GET'])
+@crawl_bp.route('/download/<path:filename>', methods=['GET'])
 def download(filename):
     safe_path = (OUTPUT_DIR / filename).resolve()
-    if safe_path.parent.resolve() != OUTPUT_DIR.resolve():
+    if not safe_path.is_relative_to(OUTPUT_DIR.resolve()):
         abort(403)
     if not safe_path.exists():
         abort(404)
-    return send_from_directory(str(OUTPUT_DIR), filename, as_attachment=True)
+    return send_from_directory(str(safe_path.parent), safe_path.name, as_attachment=True)

@@ -1,6 +1,8 @@
-from flask import render_template, request
+from flask import render_template, request, send_file, abort
 from app.blueprints.webperf import webperf_bp
-from app.blueprints.webperf.services import run_script, get_month_options, get_slides_url
+from app.blueprints.webperf.services import (
+    run_script, get_month_options, get_slides_url, list_recaps, get_recap_path
+)
 
 
 @webperf_bp.route('', methods=['GET'])
@@ -9,6 +11,7 @@ def index():
         'webperf/index.html',
         month_options=get_month_options(),
         slides_url=get_slides_url(),
+        recaps=list_recaps(),
     )
 
 
@@ -33,3 +36,24 @@ def update_slides():
         action='Mise à jour Google Slides',
         month=None,
     )
+
+
+@webperf_bp.route('/recap', methods=['POST'])
+def recap():
+    month = request.form.get('month', get_month_options()[0])
+    result = run_script('webperf_recap.py', [month])
+    return render_template(
+        'webperf/_output.html',
+        result=result,
+        action='Génération recap',
+        month=month,
+        recap_month=month if result['success'] else None,
+    )
+
+
+@webperf_bp.route('/recap/download/<month>')
+def recap_download(month):
+    path = get_recap_path(month)
+    if not path:
+        abort(404)
+    return send_file(path, as_attachment=True, download_name=path.name)

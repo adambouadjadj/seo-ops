@@ -28,5 +28,16 @@ output/
 inputs/
 tasks/
 
-# Claude Code settings (workspace-local)
+# iTools redirects — données opérationnelles et logs
+scripts/mapping_*.csv
+scripts/logs/
+
+# Claude Code settings (workspace-local) — skills exposés, le reste privé
 .claude/
+!.claude/skills/
+.claude/skills/*/cache/
+.claude/skills/*/output/
+.claude/skills/*/briefs/
+
+# Notes de session personnelles
+SESSION_*.md

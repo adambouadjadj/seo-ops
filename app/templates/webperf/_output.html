@@ -12,4 +12,11 @@
   {% if result.error %}
   <pre class="terminal-pre terminal-stderr">{{ result.error }}</pre>
   {% endif %}
+  {% if recap_month %}
+  <div style="margin-top:12px;">
+    <a href="/webperf/recap/download/{{ recap_month }}" class="btn btn-secondary btn-sm">
+      Télécharger recap_{{ recap_month }}.md
+    </a>
+  </div>
+  {% endif %}
 </div>

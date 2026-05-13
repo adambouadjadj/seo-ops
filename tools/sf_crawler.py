@@ -488,7 +488,7 @@ def generate_md(url: str, output_folder: Path, date_str: str, slug: str) -> Path
     lines.append("")
 
     # ── Écriture ─────────────────────────────────────────────────────────────
-    md_path = CRAWL_OUTPUT_BASE / f"crawl_{slug}_{date_str}.md"
+    md_path = output_folder / f"crawl_{slug}_{date_str}.md"
     md_path.parent.mkdir(parents=True, exist_ok=True)
     md_path.write_text("\n".join(lines), encoding="utf-8")
     print(f"Rapport .md : {md_path}")

@@ -2,6 +2,45 @@ from datetime import date, timedelta
 from app import db
 
 
+# ── GSC Tracker models ─────────────────────────────────────────────────────────
+
+class TrackedPage(db.Model):
+    __tablename__ = 'tracked_pages'
+
+    id            = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    url           = db.Column(db.String(2000), nullable=False)
+    label         = db.Column(db.String(500), nullable=False)
+    reason        = db.Column(db.Text, nullable=True)
+    tracked_since = db.Column(db.Date, nullable=False, default=date.today)
+    is_active     = db.Column(db.Boolean, nullable=False, default=True)
+    created_at    = db.Column(db.DateTime, nullable=False, default=db.func.now())
+
+    snapshots = db.relationship('PageSnapshot', backref='page', lazy=True,
+                                cascade='all, delete-orphan',
+                                order_by='PageSnapshot.day_offset')
+
+    @property
+    def days_tracked(self):
+        return (date.today() - self.tracked_since).days
+
+
+class PageSnapshot(db.Model):
+    __tablename__ = 'page_snapshots'
+
+    id              = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    tracked_page_id = db.Column(db.Integer,
+                                db.ForeignKey('tracked_pages.id', ondelete='CASCADE'),
+                                nullable=False)
+    day_offset      = db.Column(db.Integer, nullable=False)   # 0, 7, 14, 30, 60
+    snapshot_date   = db.Column(db.Date, nullable=False)
+    clicks          = db.Column(db.Integer, default=0)
+    impressions     = db.Column(db.Integer, default=0)
+    ctr             = db.Column(db.Float, default=0.0)
+    avg_position    = db.Column(db.Float, default=0.0)
+    top_queries     = db.Column(db.Text, nullable=True)        # JSON
+    created_at      = db.Column(db.DateTime, nullable=False, default=db.func.now())
+
+
 def get_week_monday(d=None):
     if d is None:
         d = date.today()

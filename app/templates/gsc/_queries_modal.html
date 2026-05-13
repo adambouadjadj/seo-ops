@@ -1,0 +1,21 @@
+<p style="font-size:0.75rem;color:var(--text-3);margin-bottom:12px;">{{ offset_label }}</p>
+{% if queries %}
+<table class="gsc-table">
+  <thead>
+    <tr><th>Requête</th><th>Clics</th><th>Impr.</th><th>CTR</th><th>Pos.</th></tr>
+  </thead>
+  <tbody>
+    {% for q in queries %}
+    <tr>
+      <td style="color:var(--text);">{{ q.query }}</td>
+      <td style="font-family:var(--font-mono);">{{ q.clicks }}</td>
+      <td style="font-family:var(--font-mono);">{{ q.impressions }}</td>
+      <td style="font-family:var(--font-mono);">{{ q.ctr }}%</td>
+      <td><span class="pos-badge {% if q.position <= 3 %}pos-top3{% elif q.position <= 10 %}pos-top10{% else %}pos-other{% endif %}">{{ q.position }}</span></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p style="font-size:0.85rem;color:var(--text-3);">Aucune requête enregistrée.</p>
+{% endif %}

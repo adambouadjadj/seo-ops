@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+{% block title %}GSC — SEO Ops{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">GSC</h1>
+    <p class="page-subtitle">Insights Search Console · Tracker de pages modifiées · Questions GEO</p>
+  </div>
+</div>
+
+{# ── Tabs ──────────────────────────────────────────────────────────────────── #}
+<div style="display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0;">
+  <button class="gsc-tab active" onclick="switchTab('tracker', this)">Tracker</button>
+  <button class="gsc-tab" onclick="switchTab('insights', this)">Insights</button>
+  <button class="gsc-tab" onclick="switchTab('questions', this)">Questions GEO</button>
+</div>
+
+{# ── Onglet Insights ──────────────────────────────────────────────────────── #}
+<div id="tab-insights" style="display:none;">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+    <form id="insights-form" style="display:flex;align-items:center;gap:8px;">
+      <label class="form-label" style="margin:0;">Période</label>
+      <select name="days" class="form-select" style="width:140px;">
+        <option value="28">28 derniers jours</option>
+        <option value="90" selected>90 derniers jours</option>
+        <option value="180">180 derniers jours</option>
+      </select>
+    </form>
+    <button class="btn btn-primary"
+      hx-post="/gsc/insights"
+      hx-include="#insights-form"
+      hx-target="#insights-output"
+      hx-swap="innerHTML"
+      hx-indicator="#insights-loading"
+      hx-on::after-request="updateInsightsExportLink()">
+      Analyser
+    </button>
+    <a id="insights-export-btn" href="#" class="btn btn-ghost btn-sm" style="display:none;text-decoration:none;">
+      ↓ CSV
+    </a>
+    <span id="insights-loading" class="htmx-indicator" style="font-size:0.8rem;color:var(--text-2);">
+      Chargement GSC…
+    </span>
+  </div>
+  <div id="insights-output">
+    <p style="font-size:0.85rem;color:var(--text-3);">Lance une analyse pour voir les opportunités.</p>
+  </div>
+</div>
+
+{# ── Onglet Tracker ───────────────────────────────────────────────────────── #}
+<div id="tab-tracker">
+
+  {# Formulaire ajout #}
+  <div class="webperf-panel" style="margin-bottom:20px;">
+    <p style="font-size:0.75rem;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;font-family:var(--font-mono);margin-bottom:14px;">Ajouter une page à tracker</p>
+    <form id="tracker-add-form" style="display:flex;flex-direction:column;gap:10px;">
+      <div class="form-row">
+        <div class="form-group" style="flex:2;">
+          <label class="form-label" for="t-url">URL complète</label>
+          <input type="url" id="t-url" name="url" class="form-input" placeholder="https://www.abcroisiere.com/croisiere/..." required>
+        </div>
+        <div class="form-group" style="flex:1;">
+          <label class="form-label" for="t-label">Libellé</label>
+          <input type="text" id="t-label" name="label" class="form-input" placeholder="Refonte SL navires" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="t-reason">Notes (optionnel)</label>
+        <input type="text" id="t-reason" name="reason" class="form-input" placeholder="Ex : ajout FAQ, nouveau maillage...">
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button type="submit" class="btn btn-primary btn-sm"
+          hx-post="/gsc/tracker"
+          hx-include="#tracker-add-form"
+          hx-target="#tracker-table-wrap"
+          hx-swap="innerHTML"
+          hx-indicator="#tracker-add-loading"
+          hx-on::after-request="this.closest('form').reset()">
+          + Tracker cette page
+        </button>
+        <span id="tracker-add-loading" class="htmx-indicator" style="font-size:0.8rem;color:var(--text-2);">
+          Snapshot J0 en cours…
+        </span>
+      </div>
+    </form>
+  </div>
+
+  {# Bouton refresh + table #}
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+    <button class="btn btn-secondary btn-sm"
+      hx-post="/gsc/tracker/refresh"
+      hx-target="#tracker-table-wrap"
+      hx-swap="innerHTML"
+      hx-indicator="#tracker-refresh-loading">
+      Rafraîchir les snapshots dus
+    </button>
+    <span id="tracker-refresh-loading" class="htmx-indicator" style="font-size:0.8rem;color:var(--text-2);">
+      Appel GSC…
+    </span>
+  </div>
+
+  <div id="tracker-table-wrap">
+    {% include 'gsc/_tracker_table.html' %}
+  </div>
+</div>
+
+{# ── Onglet Questions GEO ─────────────────────────────────────────────────── #}
+<div id="tab-questions" style="display:none;">
+
+  {# Controls #}
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+    <form id="questions-form" style="display:flex;align-items:center;gap:8px;">
+      <label class="form-label" style="margin:0;">Période</label>
+      <select id="questions-days-select" name="days" class="form-select" style="width:140px;" onchange="updateExportLink()">
+        <option value="28" selected>28 derniers jours</option>
+        <option value="90">90 derniers jours</option>
+      </select>
+    </form>
+    <button class="btn btn-primary"
+      hx-post="/gsc/questions/gsc"
+      hx-include="#questions-form"
+      hx-target="#questions-gsc-output"
+      hx-swap="innerHTML"
+      hx-indicator="#questions-loading">
+      Analyser GSC
+    </button>
+    <a id="export-btn" href="/gsc/questions/export?days=28" class="btn btn-ghost btn-sm" style="text-decoration:none;">
+      ↓ CSV GEO
+    </a>
+    <span id="questions-loading" class="htmx-indicator" style="font-size:0.8rem;color:var(--text-2);">
+      Chargement GSC…
+    </span>
+  </div>
+
+  {# Reminder méthode #}
+  <div style="margin-bottom:16px;">
+    <button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none';this.querySelector('.chevron').textContent=this.nextElementSibling.style.display===''?'▾':'▸';"
+      style="display:flex;align-items:center;gap:6px;background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 12px;color:var(--text-3);font-size:0.8rem;cursor:pointer;transition:all var(--transition);"
+      onmouseover="this.style.borderColor='var(--border-hover)';this.style.color='var(--text-2)'"
+      onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-3)'">
+      <span class="chevron">▸</span> Méthode d'analyse
+    </button>
+    <div style="display:none;margin-top:8px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-size:0.82rem;line-height:1.8;">
+      <p style="font-weight:600;color:var(--text);margin-bottom:10px;">Identifier les pages à optimiser</p>
+      <p style="color:var(--text-2);margin-bottom:8px;">
+        Filtre les requêtes avec <span style="color:var(--accent);font-family:var(--font-mono);">impressions élevées</span> +
+        <span style="color:var(--accent);font-family:var(--font-mono);">position 5–10</span> +
+        <span style="color:var(--accent);font-family:var(--font-mono);">CTR &lt; 1.5%</span>.
+        Ignore les FP (<code style="background:var(--surface-3);padding:1px 4px;border-radius:3px;">.html</code>) — gérées par la prod.
+      </p>
+      <p style="font-weight:600;color:var(--text);margin-bottom:8px;margin-top:12px;">Checklist par page</p>
+      <ol style="color:var(--text-2);padding-left:18px;display:flex;flex-direction:column;gap:4px;">
+        <li>Le <strong style="color:var(--text);">title</strong> contient-il la requête exacte ou une variante proche ?</li>
+        <li>La <strong style="color:var(--text);">H1 / intro</strong> adresse-t-elle directement l'intent de la requête ?</li>
+        <li>La <strong style="color:var(--text);">meta description</strong> est-elle incitative (si page contrôlée) ?</li>
+        <li>La page traite-t-elle le sujet en <strong style="color:var(--text);">profondeur</strong> ou c'est une liste générique ?</li>
+      </ol>
+      <p style="color:var(--text-3);font-size:0.75rem;margin-top:12px;border-top:1px solid var(--border);padding-top:10px;">
+        Ex : pos 9, 2 000 impr., CTR 0.5% → title à retravailler + vérifier que la requête est dans la H1.
+        Pos 2, CTR 3.5% → ne pas toucher.
+      </p>
+    </div>
+  </div>
+
+  {# Sections A + B (remplies par HTMX) #}
+  <div id="questions-gsc-output">
+    <p style="font-size:0.85rem;color:var(--text-3);">Lance une analyse pour voir les questions et la longue traîne.</p>
+  </div>
+
+  {# Section C : Semrush #}
+  <div class="webperf-panel" style="margin-top:20px;">
+    <p style="font-size:0.75rem;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;font-family:var(--font-mono);margin-bottom:14px;">Semrush — Questions PAA</p>
+    <form id="semrush-form" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <input type="text" name="keyword" class="form-input" placeholder="ex : croisière méditerranée"
+             style="flex:1;min-width:180px;" oninput="updateExportLink()">
+      <select name="database" class="form-select" style="width:80px;" onchange="updateExportLink()">
+        <option value="fr">FR</option>
+        <option value="be">BE</option>
+        <option value="ch">CH</option>
+      </select>
+      <button class="btn btn-secondary btn-sm"
+        hx-post="/gsc/questions/semrush"
+        hx-include="#semrush-form"
+        hx-target="#questions-semrush-output"
+        hx-swap="innerHTML"
+        hx-indicator="#semrush-loading">
+        Rechercher
+      </button>
+      <span id="semrush-loading" class="htmx-indicator" style="font-size:0.8rem;color:var(--text-2);">Appel Semrush…</span>
+    </form>
+    <div id="questions-semrush-output" style="margin-top:14px;"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+.gsc-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  margin-bottom: -1px;
+  transition: color var(--transition), border-color var(--transition);
+}
+.gsc-tab:hover { color: var(--text); }
+.gsc-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.insights-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.insights-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  cursor: pointer;
+  user-select: none;
+  background: var(--surface);
+  border-bottom: 1px solid transparent;
+  transition: background var(--transition);
+}
+.insights-section-header:hover { background: var(--surface-2); }
+.insights-section-header.open { border-bottom-color: var(--border); }
+.insights-section-body { padding: 0 16px 16px 16px; }
+
+.gsc-table { width:100%; border-collapse:collapse; font-size:0.8rem; }
+.gsc-table th {
+  text-align:left; padding:8px 10px;
+  font-size:0.7rem; font-weight:600;
+  color:var(--text-3); text-transform:uppercase; letter-spacing:.05em;
+  font-family:var(--font-mono);
+  border-bottom:1px solid var(--border);
+}
+.gsc-table td { padding:8px 10px; border-bottom:1px solid var(--border); color:var(--text-2); }
+.gsc-table tr:last-child td { border-bottom:none; }
+.gsc-table tr:hover td { background:var(--surface-2); color:var(--text); }
+.url-cell { max-width:300px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pos-badge {
+  display:inline-block; padding:2px 8px;
+  border-radius:10px; font-family:var(--font-mono); font-size:0.75rem; font-weight:500;
+}
+.pos-top3  { background:rgba(16,185,129,.15); color:var(--emerald); }
+.pos-top10 { background:rgba(99,102,241,.15); color:var(--accent); }
+.pos-other { background:var(--surface-3); color:var(--text-3); }
+.delta-pos { color:var(--emerald); font-weight:600; }
+.delta-neg { color:var(--red); font-weight:600; }
+.delta-neu { color:var(--text-3); }
+.badge-new {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--accent);
+  font-family: var(--font-mono);
+}
+</style>
+<script>
+function switchTab(tab, btn) {
+  document.querySelectorAll('.gsc-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  ['insights','tracker','questions'].forEach(t => {
+    document.getElementById('tab-' + t).style.display = t === tab ? '' : 'none';
+  });
+}
+
+function updateInsightsExportLink() {
+  const days = document.querySelector('#insights-form [name=days]').value;
+  const btn  = document.getElementById('insights-export-btn');
+  btn.href   = '/gsc/insights/export?days=' + days;
+  btn.style.display = '';
+}
+
+function updateExportLink() {
+  const days = document.getElementById('questions-days-select').value;
+  const kw   = document.querySelector('#semrush-form [name=keyword]').value;
+  const db   = document.querySelector('#semrush-form [name=database]').value;
+  document.getElementById('export-btn').href =
+    '/gsc/questions/export?days=' + days +
+    '&keyword=' + encodeURIComponent(kw) +
+    '&database=' + db;
+}
+document.addEventListener('htmx:afterSettle', updateExportLink);
+
+function toggleSection(id) {
+  const body = document.getElementById(id);
+  const header = body.previousElementSibling;
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : '';
+  header.classList.toggle('open', !isOpen);
+  header.querySelector('.toggle-icon').textContent = isOpen ? '▸' : '▾';
+}
+</script>
+{% endblock %}

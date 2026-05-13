@@ -1,0 +1,183 @@
+{% if data.get('error') %}
+<div style="padding:12px 16px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);border-radius:var(--radius);color:var(--red);font-size:0.85rem;">
+  Erreur GSC : {{ data.error }}
+</div>
+
+{% else %}
+<p style="font-size:0.8rem;color:var(--text-3);margin-bottom:16px;">
+  Période analysée : {{ data.start_date }} → {{ data.end_date }} ({{ data.period_days }}j)
+</p>
+
+{# ── Quick wins ──────────────────────────────────────────────────────────── #}
+<div class="insights-section">
+  <div class="insights-section-header open" onclick="toggleSection('qw-body')">
+    <span style="font-weight:600;font-size:0.875rem;">
+      Quick wins
+      <span style="font-size:0.75rem;color:var(--text-3);font-weight:400;margin-left:8px;">pos 4–20, impressions ≥ 100</span>
+    </span>
+    <span style="display:flex;align-items:center;gap:10px;">
+      <span style="font-family:var(--font-mono);font-size:0.8rem;color:var(--accent);">{{ data.quick_wins|length }}</span>
+      <span class="toggle-icon">▾</span>
+    </span>
+  </div>
+  <div id="qw-body" class="insights-section-body">
+    {% if data.quick_wins %}
+    <table class="gsc-table" style="margin-top:12px;">
+      <thead>
+        <tr>
+          <th>URL</th>
+          <th>Position</th>
+          <th>Impressions</th>
+          <th>Clics</th>
+          <th>CTR</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in data.quick_wins %}
+        <tr>
+          <td class="url-cell" title="{{ p.url }}">
+            <a href="{{ p.url }}" target="_blank" rel="noopener"
+               style="color:var(--text-2);text-decoration:none;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-2)'">
+              {{ p.url|replace('https://www.abcroisiere.com', '') or '/' }}
+            </a>
+          </td>
+          <td>
+            <span class="pos-badge {% if p.position <= 3 %}pos-top3{% elif p.position <= 10 %}pos-top10{% else %}pos-other{% endif %}">
+              {{ p.position }}
+            </span>
+          </td>
+          <td style="font-family:var(--font-mono);">{{ "{:,}".format(p.impressions) }}</td>
+          <td style="font-family:var(--font-mono);">{{ p.clicks }}</td>
+          <td style="font-family:var(--font-mono);">{{ p.ctr }}%</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p style="font-size:0.85rem;color:var(--text-3);padding-top:12px;">Aucune page identifiée.</p>
+    {% endif %}
+  </div>
+</div>
+
+{# ── CTR anormal ─────────────────────────────────────────────────────────── #}
+<div class="insights-section">
+  <div class="insights-section-header" onclick="toggleSection('ctr-body')">
+    <span style="font-weight:600;font-size:0.875rem;">
+      CTR anormal
+      <span style="font-size:0.75rem;color:var(--text-3);font-weight:400;margin-left:8px;">CTR &lt; 50% du CTR attendu pour la position</span>
+    </span>
+    <span style="display:flex;align-items:center;gap:10px;">
+      <span style="font-family:var(--font-mono);font-size:0.8rem;color:var(--amber);">{{ data.ctr_gap|length }}</span>
+      <span class="toggle-icon">▸</span>
+    </span>
+  </div>
+  <div id="ctr-body" class="insights-section-body" style="display:none;">
+    {% if data.ctr_gap %}
+    <table class="gsc-table" style="margin-top:12px;">
+      <thead>
+        <tr><th>URL</th><th>Position</th><th>CTR réel</th><th>CTR attendu</th><th>Manque</th><th>Impr.</th></tr>
+      </thead>
+      <tbody>
+        {% for p in data.ctr_gap %}
+        <tr>
+          <td class="url-cell" title="{{ p.url }}">
+            <a href="{{ p.url }}" target="_blank" rel="noopener"
+               style="color:var(--text-2);text-decoration:none;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-2)'">
+              {{ p.url|replace('https://www.abcroisiere.com', '') or '/' }}
+            </a>
+          </td>
+          <td><span class="pos-badge pos-top10">{{ p.position }}</span></td>
+          <td style="font-family:var(--font-mono);color:var(--red);">{{ p.ctr }}%</td>
+          <td style="font-family:var(--font-mono);color:var(--text-3);">{{ p.expected_ctr }}%</td>
+          <td style="font-family:var(--font-mono);color:var(--amber);">-{{ p.gap }}pts</td>
+          <td style="font-family:var(--font-mono);">{{ "{:,}".format(p.impressions) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p style="font-size:0.85rem;color:var(--text-3);padding-top:12px;">Aucune page identifiée.</p>
+    {% endif %}
+  </div>
+</div>
+
+{# ── Impressions sans clics ──────────────────────────────────────────────── #}
+<div class="insights-section">
+  <div class="insights-section-header" onclick="toggleSection('nc-body')">
+    <span style="font-weight:600;font-size:0.875rem;">
+      Impressions sans clics
+      <span style="font-size:0.75rem;color:var(--text-3);font-weight:400;margin-left:8px;">CTR &lt; 0.5%, impressions ≥ 200</span>
+    </span>
+    <span style="display:flex;align-items:center;gap:10px;">
+      <span style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-3);">{{ data.no_clicks|length }}</span>
+      <span class="toggle-icon">▸</span>
+    </span>
+  </div>
+  <div id="nc-body" class="insights-section-body" style="display:none;">
+    {% if data.no_clicks %}
+    <table class="gsc-table" style="margin-top:12px;">
+      <thead>
+        <tr><th>URL</th><th>Impressions</th><th>CTR</th><th>Position</th></tr>
+      </thead>
+      <tbody>
+        {% for p in data.no_clicks %}
+        <tr>
+          <td class="url-cell" title="{{ p.url }}">
+            <a href="{{ p.url }}" target="_blank" rel="noopener"
+               style="color:var(--text-2);text-decoration:none;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-2)'">
+              {{ p.url|replace('https://www.abcroisiere.com', '') or '/' }}
+            </a>
+          </td>
+          <td style="font-family:var(--font-mono);">{{ "{:,}".format(p.impressions) }}</td>
+          <td style="font-family:var(--font-mono);color:var(--red);">{{ p.ctr }}%</td>
+          <td><span class="pos-badge pos-other">{{ p.position }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p style="font-size:0.85rem;color:var(--text-3);padding-top:12px;">Aucune page identifiée.</p>
+    {% endif %}
+  </div>
+</div>
+
+{# ── Cannibalisation ─────────────────────────────────────────────────────── #}
+<div class="insights-section">
+  <div class="insights-section-header" onclick="toggleSection('cann-body')">
+    <span style="font-weight:600;font-size:0.875rem;">
+      Cannibalisation
+      <span style="font-size:0.75rem;color:var(--text-3);font-weight:400;margin-left:8px;">requête avec 2+ pages dans top 20</span>
+    </span>
+    <span style="display:flex;align-items:center;gap:10px;">
+      <span style="font-family:var(--font-mono);font-size:0.8rem;color:var(--red);">{{ data.cannibalisations|length }}</span>
+      <span class="toggle-icon">▸</span>
+    </span>
+  </div>
+  <div id="cann-body" class="insights-section-body" style="display:none;">
+    {% if data.cannibalisations %}
+    {% for c in data.cannibalisations %}
+    <div style="margin-top:12px;padding:10px 12px;background:var(--surface-2);border-radius:var(--radius-sm);">
+      <p style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text);margin-bottom:8px;">
+        "{{ c.query }}"
+      </p>
+      {% for pg in c.pages %}
+      <div style="display:flex;align-items:center;gap:12px;font-size:0.8rem;color:var(--text-2);margin-bottom:4px;">
+        <span class="pos-badge {% if pg.position <= 3 %}pos-top3{% elif pg.position <= 10 %}pos-top10{% else %}pos-other{% endif %}" style="flex-shrink:0;">
+          {{ pg.position }}
+        </span>
+        <a href="{{ pg.url }}" target="_blank" rel="noopener"
+           style="color:var(--text-2);text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"
+           onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-2)'">
+          {{ pg.url|replace('https://www.abcroisiere.com', '') or '/' }}
+        </a>
+        <span style="flex-shrink:0;font-family:var(--font-mono);color:var(--text-3);">{{ pg.clicks }} clics</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+    {% else %}
+    <p style="font-size:0.85rem;color:var(--text-3);padding-top:12px;">Aucune cannibalisation détectée.</p>
+    {% endif %}
+  </div>
+</div>
+{% endif %}

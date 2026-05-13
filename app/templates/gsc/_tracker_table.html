@@ -1,0 +1,147 @@
+{% if refresh_result is defined %}
+<div style="margin-bottom:12px;padding:8px 12px;background:{% if refresh_result.errors %}rgba(245,158,11,.08){% else %}rgba(16,185,129,.08){% endif %};border:1px solid {% if refresh_result.errors %}rgba(245,158,11,.3){% else %}rgba(16,185,129,.3){% endif %};border-radius:var(--radius-sm);font-size:0.8rem;color:{% if refresh_result.errors %}var(--amber){% else %}var(--emerald){% endif %};">
+  {{ refresh_result.taken }} snapshot(s) pris.
+  {% if refresh_result.errors %}Erreurs : {{ refresh_result.errors|join(', ') }}{% endif %}
+</div>
+{% endif %}
+
+{% if pages %}
+<div style="overflow-x:auto;">
+  <table class="gsc-table">
+    <thead>
+      <tr>
+        <th style="min-width:200px;">Page</th>
+        <th>Depuis</th>
+        {% for offset in day_offsets %}
+        <th style="min-width:80px;text-align:center;">{{ offset_labels[offset] }}</th>
+        {% endfor %}
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for page in pages %}
+      {% set snaps = snapshot_map(page) %}
+      {% set jbase = snaps.get(-7) %}
+      <tr id="tracker-row-{{ page.id }}">
+        <td>
+          <div style="font-weight:500;color:var(--text);margin-bottom:2px;">{{ page.label }}</div>
+          <div style="font-size:0.75rem;color:var(--text-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px;" title="{{ page.url }}">
+            <a href="{{ page.url }}" target="_blank" rel="noopener"
+               style="color:var(--text-3);text-decoration:none;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-3)'">
+              {{ page.url|replace('https://www.abcroisiere.com', '') or '/' }}
+            </a>
+          </div>
+          {% if page.reason %}
+          <div style="font-size:0.7rem;color:var(--text-3);margin-top:2px;font-style:italic;">{{ page.reason }}</div>
+          {% endif %}
+        </td>
+        <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-3);white-space:nowrap;">
+          {{ page.tracked_since.strftime('%d/%m/%y') }}<br>
+          <span style="color:var(--text-3);">J+{{ page.days_tracked }}</span>
+        </td>
+
+        {% for offset in day_offsets %}
+        {% set snap = snaps.get(offset) %}
+        <td style="vertical-align:middle;padding:8px 6px;">
+          {% if snap %}
+            {% if jbase and offset != -7 and jbase.avg_position > 0 and snap.avg_position > 0 %}
+              {% set delta_pos = jbase.avg_position - snap.avg_position %}
+              {% set delta_clics = snap.clicks - jbase.clicks %}
+            {% else %}
+              {% set delta_pos = 0 %}
+              {% set delta_clics = 0 %}
+            {% endif %}
+            <div style="display:flex;flex-direction:column;gap:5px;min-width:80px;">
+
+              {# Clics #}
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+                <span style="font-size:0.65rem;color:var(--text-3);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.04em;">clics</span>
+                <span style="font-family:var(--font-mono);font-size:0.8rem;font-weight:600;color:var(--text);">{{ snap.clicks }}</span>
+              </div>
+
+              {# Position #}
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+                <span style="font-size:0.65rem;color:var(--text-3);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.04em;">pos</span>
+                <span style="font-family:var(--font-mono);font-size:0.8rem;
+                  color:{% if snap.avg_position <= 3 %}var(--emerald){% elif snap.avg_position <= 10 %}var(--accent){% else %}var(--text-2){% endif %};">
+                  {{ snap.avg_position }}
+                  {% if offset != -7 and delta_pos != 0 %}
+                    <span style="font-size:0.7rem;
+                      color:{% if delta_pos > 0 %}var(--emerald){% else %}var(--red){% endif %};">
+                      {% if delta_pos > 0 %}▲{% else %}▼{% endif %}{{ "%.1f"|format(delta_pos|abs) }}
+                    </span>
+                  {% endif %}
+                </span>
+              </div>
+
+              {# CTR #}
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+                <span style="font-size:0.65rem;color:var(--text-3);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.04em;">ctr</span>
+                <span style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-2);">{{ snap.ctr }}%</span>
+              </div>
+
+              {# Bouton requêtes #}
+              {% if snap.top_queries %}
+              <button style="margin-top:2px;background:var(--surface-3);border:1px solid var(--border);border-radius:var(--radius-sm);
+                             color:var(--text-3);font-size:0.65rem;padding:2px 6px;cursor:pointer;width:100%;
+                             font-family:var(--font-mono);transition:all var(--transition);"
+                onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'"
+                onmouseout="this.style.color='var(--text-3)';this.style.borderColor='var(--border)'"
+                hx-get="/gsc/tracker/{{ page.id }}/queries?offset={{ offset }}"
+                hx-target="#queries-modal-content"
+                hx-swap="innerHTML"
+                onclick="document.getElementById('queries-modal').style.display='flex'">
+                requêtes →
+              </button>
+              {% endif %}
+            </div>
+          {% else %}
+            {% set available = page.days_tracked >= offset + 3 or offset <= 0 %}
+            <div style="text-align:center;">
+            {% if available %}
+              <button class="btn btn-ghost btn-sm" style="padding:3px 10px;font-size:0.72rem;"
+                hx-post="/gsc/tracker/{{ page.id }}/snapshot?offset={{ offset }}"
+                hx-target="#tracker-table-wrap"
+                hx-swap="innerHTML">
+                Prendre
+              </button>
+            {% else %}
+              <span style="font-size:0.72rem;color:var(--text-3);font-family:var(--font-mono);">
+                dans {{ offset + 3 - page.days_tracked }}j
+              </span>
+            {% endif %}
+            </div>
+          {% endif %}
+        </td>
+        {% endfor %}
+
+        <td>
+          <button class="btn-icon btn-delete" style="opacity:1;"
+            hx-delete="/gsc/tracker/{{ page.id }}"
+            hx-target="#tracker-table-wrap"
+            hx-swap="innerHTML"
+            hx-confirm="Supprimer '{{ page.label }}' et tous ses snapshots ?"
+            title="Supprimer">
+            ✕
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p style="font-size:0.85rem;color:var(--text-3);">Aucune page trackée. Ajoute une URL ci-dessus après une publication.</p>
+{% endif %}
+
+{# ── Modal top requêtes ──────────────────────────────────────────────────── #}
+<div id="queries-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);width:min(560px,90vw);max-height:80vh;overflow:auto;padding:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <span style="font-family:var(--font-mono);font-weight:600;font-size:0.875rem;color:var(--text);">Top requêtes</span>
+      <button onclick="document.getElementById('queries-modal').style.display='none'"
+              style="background:none;border:none;color:var(--text-3);font-size:1.2rem;cursor:pointer;line-height:1;">✕</button>
+    </div>
+    <div id="queries-modal-content"></div>
+  </div>
+</div>

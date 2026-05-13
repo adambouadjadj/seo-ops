@@ -1,0 +1,12 @@
+{% if error %}
+<div style="display:flex; align-items:center; gap:8px; color:#c0392b; font-size:13px;">
+  <span>✗</span>
+  <span>Erreur : {{ error }}</span>
+</div>
+{% else %}
+<div style="display:flex; align-items:center; gap:8px; color:#27ae60; font-size:13px;">
+  <span>✓</span>
+  <span>{{ filename }}</span>
+</div>
+<input type="hidden" name="gsc_prefetched" value="{{ filename }}">
+{% endif %}

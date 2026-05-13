@@ -1,0 +1,42 @@
+{% if not data.has_key %}
+<div style="padding:10px 14px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:var(--radius-sm);color:var(--amber);font-size:0.85rem;">
+  Ajouter <code style="background:var(--surface-3);padding:1px 5px;border-radius:3px;">SEMRUSH_API_KEY=ta_cle</code> dans <code style="background:var(--surface-3);padding:1px 5px;border-radius:3px;">tools/.env</code> pour activer cette section.
+</div>
+
+{% elif data.error %}
+<div style="padding:10px 14px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);border-radius:var(--radius-sm);color:var(--red);font-size:0.85rem;">
+  {{ data.error }}
+</div>
+
+{% elif data.rows %}
+<p style="font-size:0.8rem;color:var(--text-3);margin-bottom:12px;">
+  {{ data.rows|length }} question(s) pour "<strong style="color:var(--text);">{{ data.keyword }}</strong>" ({{ data.database }})
+</p>
+<table class="gsc-table">
+  <thead>
+    <tr><th>Requête</th><th>Volume</th><th>Compétition</th></tr>
+  </thead>
+  <tbody>
+    {% for row in data.rows %}
+    <tr>
+      <td style="color:var(--text);word-break:break-word;">{{ row.phrase }}</td>
+      <td style="font-family:var(--font-mono);">
+        {% if row.volume > 0 %}{{ "{:,}".format(row.volume) }}{% else %}<span style="color:var(--text-3);">—</span>{% endif %}
+      </td>
+      <td style="font-family:var(--font-mono);">
+        {% if row.competition >= 0.7 %}
+          <span style="color:var(--red);">{{ row.competition }}</span>
+        {% elif row.competition >= 0.4 %}
+          <span style="color:var(--amber);">{{ row.competition }}</span>
+        {% else %}
+          <span style="color:var(--emerald);">{{ row.competition }}</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% else %}
+<p style="font-size:0.85rem;color:var(--text-3);">Aucun résultat pour ce mot-clé.</p>
+{% endif %}

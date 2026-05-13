@@ -38,6 +38,7 @@ def create_app(config_object=None):
     from app.blueprints.webperf import webperf_bp
     from app.blueprints.reporting import reporting_bp
     from app.blueprints.crawl import crawl_bp
+    from app.blueprints.gsc import gsc_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(tasks_bp)
@@ -45,6 +46,7 @@ def create_app(config_object=None):
     app.register_blueprint(webperf_bp)
     app.register_blueprint(reporting_bp)
     app.register_blueprint(crawl_bp)
+    app.register_blueprint(gsc_bp)
 
     with app.app_context():
         db.create_all()

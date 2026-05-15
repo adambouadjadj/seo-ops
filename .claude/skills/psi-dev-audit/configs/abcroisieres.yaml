@@ -1,0 +1,15 @@
+site: abcroisieres
+base_url: https://www.abcroisiere.com
+pages:
+  - label: homepage
+    url: https://www.abcroisiere.com/
+  - label: sl_destination_mediterranee
+    url: https://www.abcroisiere.com/fr/croisieres/croisiere-mediterranee/destination,53,0/
+  - label: sl_compagnie_msc
+    url: https://www.abcroisiere.com/fr/croisieres/croisiere-msc-croisieres/compagnie,13/
+  - label: page_navire_costa_toscana
+    url: https://www.abcroisiere.com/fr/bateau-croisiere/costa-toscana/navire,1420/
+  - label: fiche_produit
+    url: https://www.abcroisiere.com/croisiere-italie-malte-espagne-1553162.html
+  - label: page_thematique_derniere_minute
+    url: https://www.abcroisiere.com/fr/croisieres/croisiere-derniere-minute/

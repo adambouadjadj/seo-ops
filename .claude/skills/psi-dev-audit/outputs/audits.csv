@@ -1,0 +1,25 @@
+date,template,device,perf_score,fcp_ms,fcp_score,lcp_ms,lcp_score,tbt_ms,tbt_score,cls,cls_score,si_ms,lcp_element,mainthread_total_s
+2026-04-20,fiche_produit,mobile,60,6001,0.04,8701,0.01,18,1,0,1,6001,,1
+2026-04-20,fiche_produit,desktop,92,445,1,1393,0.84,147,0.9,0.008626,1,1292,,1
+2026-04-20,homepage,mobile,75,1806,0.89,7501,0.04,0,1,0,1,1806,,0
+2026-04-20,homepage,desktop,54,1121,0.8,1261,0.88,565,0.23,0.302515,0.39,1775,,3
+2026-04-20,page_navire_costa_toscana,mobile,61,5851,0.04,8401,0.02,68,0.99,0,1,5851,,0
+2026-04-20,page_navire_costa_toscana,desktop,72,1081,0.82,1201,0.89,484,0.31,0.040791,0.99,1679,,3
+2026-04-20,page_thematique_derniere_minute,mobile,94,1805,0.89,2926,0.8,4,1,0.000251,1,1805,,0
+2026-04-20,page_thematique_derniere_minute,desktop,52,721,0.97,3285,0.28,941,0.06,0.044591,0.99,1405,,4
+2026-04-20,sl_compagnie_msc,mobile,60,6001,0.04,9151,0.01,20,1,0.015219,1,6001,,1
+2026-04-20,sl_compagnie_msc,desktop,40,485,1,5461,0.06,4075,0,0.022063,1,2772,,9
+2026-04-20,sl_destination_mediterranee,mobile,53,3451,0.36,4576,0.35,2,1,0.757205,0.06,3451,,0
+2026-04-20,sl_destination_mediterranee,desktop,18,721,0.97,5612,0.05,2916,0,0.7357259999999999,0.06,2066,,7
+2026-04-20,fiche_produit,mobile,60,6001,0.04,8701,0.01,18,1,0,1,6001,body > img,1
+2026-04-20,fiche_produit,desktop,92,445,1,1393,0.84,147,0.9,0.008626,1,1292,div.kv-row > div.kv-layout-visuels > div.kv-image-fp-first > img,1
+2026-04-20,homepage,mobile,75,1806,0.89,7501,0.04,0,1,0,1,1806,div.kv-hero__track > article.kv-hero__card > a > img.kv-hero__img,0
+2026-04-20,homepage,desktop,54,1121,0.8,1261,0.88,565,0.23,0.302515,0.39,1775,article.kv-hero__card > a > img.kv-hero__img,3
+2026-04-20,page_navire_costa_toscana,mobile,61,5851,0.04,8401,0.02,68,0.99,0,1,5851,body > img,0
+2026-04-20,page_navire_costa_toscana,desktop,72,1081,0.82,1201,0.89,484,0.31,0.040791,0.99,1679,div.kv-Multimedia-contentImages > div.kv-MultimediaImage > div.kv-Owl-item > img.kv-MultimediaImage,3
+2026-04-20,page_thematique_derniere_minute,mobile,94,1805,0.89,2926,0.8,4,1,0.000251,1,1805,body > img,0
+2026-04-20,page_thematique_derniere_minute,desktop,52,721,0.97,3285,0.28,941,0.06,0.044591,0.99,1405,div.kv-Croisiere-cards > div.kv-cruise-card > a.kv-cruise-card__image > img.kv-cruise-card__main-img,4
+2026-04-20,sl_compagnie_msc,mobile,60,6001,0.04,9151,0.01,20,1,0.015219,1,6001,body > img,1
+2026-04-20,sl_compagnie_msc,desktop,40,485,1,5461,0.06,4075,0,0.022063,1,2772,div.kv-Croisiere-cards > div.kv-cruise-card > a.kv-cruise-card__image > img.kv-cruise-card__main-img,9
+2026-04-20,sl_destination_mediterranee,mobile,53,3451,0.36,4576,0.35,2,1,0.757205,0.06,3451,body > img,0
+2026-04-20,sl_destination_mediterranee,desktop,18,721,0.97,5612,0.05,2916,0,0.7357259999999999,0.06,2066,div.kv-Croisiere-cards > div.kv-cruise-card > a.kv-cruise-card__image > img.kv-cruise-card__main-img,7

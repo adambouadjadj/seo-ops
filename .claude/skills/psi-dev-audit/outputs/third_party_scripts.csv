@@ -1,0 +1,82 @@
+date,template,device,entity,main_thread_ms,blocking_ms,transfer_size_kb
+2026-04-20,fiche_produit,mobile,AppDynamics,158,,206.7
+2026-04-20,fiche_produit,mobile,JSDelivr CDN,0,,8.2
+2026-04-20,fiche_produit,desktop,Google Tag Manager,301,,468.6
+2026-04-20,fiche_produit,desktop,AppDynamics,282,,206.7
+2026-04-20,fiche_produit,desktop,Didomi,84,,189.2
+2026-04-20,fiche_produit,desktop,ContentSquare,63,,137.3
+2026-04-20,fiche_produit,desktop,JSDelivr CDN,0,,8.0
+2026-04-20,fiche_produit,desktop,service-voyages.com,0,,783.8
+2026-04-20,fiche_produit,desktop,Google/Doubleclick Ads,0,,0.5
+2026-04-20,fiche_produit,desktop,crocierepromo.it,0,,5.9
+2026-04-20,fiche_produit,desktop,Google Analytics,0,,0.8
+2026-04-20,fiche_produit,desktop,appspot.com,0,,1.2
+2026-04-20,homepage,mobile,AppDynamics,59,,206.7
+2026-04-20,homepage,mobile,JSDelivr CDN,0,,7.8
+2026-04-20,homepage,desktop,Google Tag Manager,848,,469.2
+2026-04-20,homepage,desktop,ContentSquare,152,,137.3
+2026-04-20,homepage,desktop,AppDynamics,129,,206.7
+2026-04-20,homepage,desktop,Didomi,123,,189.2
+2026-04-20,homepage,desktop,Trust Pilot,35,,38.2
+2026-04-20,homepage,desktop,JSDelivr CDN,0,,8.1
+2026-04-20,homepage,desktop,service-voyages.com,0,,1360.8
+2026-04-20,homepage,desktop,crocierepromo.it,0,,5.9
+2026-04-20,homepage,desktop,Google/Doubleclick Ads,0,,0.5
+2026-04-20,homepage,desktop,Google Analytics,0,,0.8
+2026-04-20,homepage,desktop,appspot.com,0,,1.2
+2026-04-20,page_navire_costa_toscana,mobile,AppDynamics,167,,206.7
+2026-04-20,page_navire_costa_toscana,mobile,JSDelivr CDN,0,,8.1
+2026-04-20,page_navire_costa_toscana,desktop,Google Tag Manager,697,,468.6
+2026-04-20,page_navire_costa_toscana,desktop,ContentSquare,240,,137.3
+2026-04-20,page_navire_costa_toscana,desktop,AppDynamics,136,,206.7
+2026-04-20,page_navire_costa_toscana,desktop,Didomi,125,,189.2
+2026-04-20,page_navire_costa_toscana,desktop,Other Google APIs/SDKs,23,,43.9
+2026-04-20,page_navire_costa_toscana,desktop,adtrafficquality.google,23,,23.1
+2026-04-20,page_navire_costa_toscana,desktop,Google/Doubleclick Ads,12,,23.1
+2026-04-20,page_navire_costa_toscana,desktop,JSDelivr CDN,0,,8.1
+2026-04-20,page_navire_costa_toscana,desktop,service-voyages.com,0,,1818.9
+2026-04-20,page_navire_costa_toscana,desktop,crocierepromo.it,0,,5.9
+2026-04-20,page_navire_costa_toscana,desktop,Google Analytics,0,,0.8
+2026-04-20,page_navire_costa_toscana,desktop,appspot.com,0,,1.1
+2026-04-20,page_thematique_derniere_minute,mobile,AppDynamics,110,,206.7
+2026-04-20,page_thematique_derniere_minute,mobile,JSDelivr CDN,0,,8.1
+2026-04-20,page_thematique_derniere_minute,desktop,Google Tag Manager,635,,468.4
+2026-04-20,page_thematique_derniere_minute,desktop,ContentSquare,173,,137.3
+2026-04-20,page_thematique_derniere_minute,desktop,AppDynamics,131,,206.7
+2026-04-20,page_thematique_derniere_minute,desktop,Didomi,116,,189.2
+2026-04-20,page_thematique_derniere_minute,desktop,Other Google APIs/SDKs,24,,43.9
+2026-04-20,page_thematique_derniere_minute,desktop,adtrafficquality.google,16,,22.9
+2026-04-20,page_thematique_derniere_minute,desktop,Google/Doubleclick Ads,10,,23.1
+2026-04-20,page_thematique_derniere_minute,desktop,JSDelivr CDN,0,,8.1
+2026-04-20,page_thematique_derniere_minute,desktop,service-voyages.com,0,,2501.8
+2026-04-20,page_thematique_derniere_minute,desktop,crocierepromo.it,0,,5.9
+2026-04-20,page_thematique_derniere_minute,desktop,Google Analytics,0,,0.8
+2026-04-20,page_thematique_derniere_minute,desktop,appspot.com,0,,1.2
+2026-04-20,sl_compagnie_msc,mobile,AppDynamics,158,,206.7
+2026-04-20,sl_compagnie_msc,mobile,JSDelivr CDN,0,,8.1
+2026-04-20,sl_compagnie_msc,desktop,Google Tag Manager,1252,,468.5
+2026-04-20,sl_compagnie_msc,desktop,AppDynamics,415,,206.7
+2026-04-20,sl_compagnie_msc,desktop,ContentSquare,405,,137.3
+2026-04-20,sl_compagnie_msc,desktop,Didomi,235,,189.2
+2026-04-20,sl_compagnie_msc,desktop,adtrafficquality.google,36,,23.1
+2026-04-20,sl_compagnie_msc,desktop,Other Google APIs/SDKs,33,,43.9
+2026-04-20,sl_compagnie_msc,desktop,Google/Doubleclick Ads,20,,22.9
+2026-04-20,sl_compagnie_msc,desktop,JSDelivr CDN,0,,8.1
+2026-04-20,sl_compagnie_msc,desktop,service-voyages.com,0,,2468.6
+2026-04-20,sl_compagnie_msc,desktop,crocierepromo.it,0,,5.9
+2026-04-20,sl_compagnie_msc,desktop,Google Analytics,0,,0.8
+2026-04-20,sl_compagnie_msc,desktop,appspot.com,0,,1.2
+2026-04-20,sl_destination_mediterranee,mobile,AppDynamics,97,,206.7
+2026-04-20,sl_destination_mediterranee,mobile,JSDelivr CDN,0,,8.4
+2026-04-20,sl_destination_mediterranee,desktop,Google Tag Manager,870,,468.6
+2026-04-20,sl_destination_mediterranee,desktop,AppDynamics,214,,206.7
+2026-04-20,sl_destination_mediterranee,desktop,ContentSquare,205,,137.3
+2026-04-20,sl_destination_mediterranee,desktop,Didomi,150,,189.2
+2026-04-20,sl_destination_mediterranee,desktop,Other Google APIs/SDKs,24,,43.9
+2026-04-20,sl_destination_mediterranee,desktop,adtrafficquality.google,18,,23.0
+2026-04-20,sl_destination_mediterranee,desktop,Google/Doubleclick Ads,12,,22.9
+2026-04-20,sl_destination_mediterranee,desktop,JSDelivr CDN,0,,8.1
+2026-04-20,sl_destination_mediterranee,desktop,service-voyages.com,0,,2298.0
+2026-04-20,sl_destination_mediterranee,desktop,crocierepromo.it,0,,5.9
+2026-04-20,sl_destination_mediterranee,desktop,Google Analytics,0,,0.8
+2026-04-20,sl_destination_mediterranee,desktop,appspot.com,0,,1.2

@@ -40,6 +40,8 @@ scripts/logs/
 .claude/todos/
 .claude/skills/*/cache/
 .claude/skills/*/output/
+.claude/skills/*/outputs/????-??-??/
+.claude/skills/*/runs/
 .claude/skills/*/briefs/
 
 # Notes de session personnelles
